@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { productSchema, ProductFormValues } from "@/schemas/product";
 import api from "@/lib/axios";
+import { getErrorMessage } from "@/utils/error";
 
 interface ProductFormProps {
 	initialData?: ProductFormValues & { id: string };
@@ -25,7 +26,6 @@ interface ProductFormProps {
 
 export function ProductForm({ initialData }: ProductFormProps) {
 	const router = useRouter();
-	const [loading, setLoading] = useState(false);
 
 	const title = initialData ? "Edit Product" : "Create Product";
 	const description = initialData ? "Edit a product" : "Add a new product";
@@ -42,22 +42,29 @@ export function ProductForm({ initialData }: ProductFormProps) {
 		},
 	});
 
-	const onSubmit = async (data: ProductFormValues) => {
-		try {
-			setLoading(true);
+	const queryClient = useQueryClient();
+
+	const mutation = useMutation({
+		mutationFn: async (data: ProductFormValues) => {
 			if (initialData) {
 				await api.put(`/products/${initialData.id}`, data);
 			} else {
 				await api.post("/products", data);
 			}
+		},
+		onSuccess: () => {
 			router.refresh();
 			router.push("/admin/products");
 			toast.success(initialData ? "Product updated" : "Product created");
-		} catch (error) {
-			toast.error("Something went wrong");
-		} finally {
-			setLoading(false);
-		}
+			queryClient.invalidateQueries({ queryKey: ["products"] });
+		},
+		onError: (error) => {
+			toast.error(getErrorMessage(error));
+		},
+	});
+
+	const onSubmit = (data: ProductFormValues) => {
+		mutation.mutate(data);
 	};
 
 	return (
@@ -81,7 +88,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 								<FormControl>
 									<ImageUpload
 										value={field.value.map((image) => image)}
-										disabled={loading}
+										disabled={mutation.isPending}
 										onChange={(urls) => field.onChange(urls)}
 										onRemove={(url) =>
 											field.onChange(
@@ -103,7 +110,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 									<FormLabel>Name</FormLabel>
 									<FormControl>
 										<Input
-											disabled={loading}
+											disabled={mutation.isPending}
 											placeholder="Product name"
 											{...field}
 										/>
@@ -121,7 +128,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 									<FormControl>
 										<Input
 											type="number"
-											disabled={loading}
+											disabled={mutation.isPending}
 											placeholder="9.99"
 											{...field}
 										/>
@@ -139,7 +146,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 									<FormControl>
 										<Input
 											type="number"
-											disabled={loading}
+											disabled={mutation.isPending}
 											placeholder="10"
 											{...field}
 										/>
@@ -157,7 +164,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 								<FormLabel>Description</FormLabel>
 								<FormControl>
 									<Input
-										disabled={loading}
+										disabled={mutation.isPending}
 										placeholder="Product description"
 										{...field}
 									/>
@@ -166,7 +173,10 @@ export function ProductForm({ initialData }: ProductFormProps) {
 							</FormItem>
 						)}
 					/>
-					<Button disabled={loading} className="ml-auto" type="submit">
+					<Button
+						disabled={mutation.isPending}
+						className="ml-auto"
+						type="submit">
 						{action}
 					</Button>
 				</form>
