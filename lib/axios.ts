@@ -1,30 +1,35 @@
 import axios from "axios";
 
+import { stringifyQuery } from "@/utils/query-params";
+
 const api = axios.create({
-  baseURL: "/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+	baseURL: "/api",
+	headers: {
+		"Content-Type": "application/json",
+	},
+	paramsSerializer: (params) => {
+		return stringifyQuery(params);
+	},
 });
 
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+	(response) => response,
+	async (error) => {
+		const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			originalRequest._retry = true;
 
-      try {
-        await axios.post("/api/auth/refresh");
-        return api(originalRequest);
-      } catch (refreshError) {
-        return Promise.reject(refreshError);
-      }
-    }
+			try {
+				await axios.post("/api/auth/refresh");
+				return api(originalRequest);
+			} catch (refreshError) {
+				return Promise.reject(refreshError);
+			}
+		}
 
-    return Promise.reject(error);
-  }
+		return Promise.reject(error);
+	}
 );
 
 export default api;

@@ -32,3 +32,14 @@ model RefreshToken {
    revoked   Boolean  @default(false)
    createdAt DateTime @default(now())
 }
+
+model Product {
+   id          String   @id @default(cuid())
+   name        String
+   description String
+   price       Float
+   stock       Int
+   images      String[]
+   createdAt   DateTime @default(now())
+   updatedAt   DateTime @updatedAt
+}
