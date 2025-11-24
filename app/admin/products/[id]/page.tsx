@@ -1,7 +1,5 @@
 import { ProductForm } from "@/components/admin/product-form";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { getProduct } from "@/services/products";
 
 export default async function EditProductPage({
 	params,
@@ -9,9 +7,7 @@ export default async function EditProductPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	const product = await prisma.product.findUnique({
-		where: { id },
-	});
+	const product = await getProduct(id);
 
 	if (!product) {
 		return <div>Product not found</div>;

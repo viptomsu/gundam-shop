@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { productSchema } from "@/schemas/product";
 import { paginationSchema, searchSchema } from "@/schemas/common";
-
-const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
 	try {
