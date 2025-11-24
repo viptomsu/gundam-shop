@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { Editor } from "@/components/ui/editor";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { productSchema, ProductFormValues } from "@/schemas/product";
@@ -102,78 +103,82 @@ export function ProductForm({ initialData }: ProductFormProps) {
 							</FormItem>
 						)}
 					/>
-					<div className="grid grid-cols-3 gap-8">
-						<FormField
-							control={form.control}
-							name="name"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Name</FormLabel>
-									<FormControl>
-										<Input
-											disabled={mutation.isPending}
-											placeholder="Product name"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="price"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Price</FormLabel>
-									<FormControl>
-										<Input
-											type="number"
-											disabled={mutation.isPending}
-											placeholder="9.99"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="stock"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Stock</FormLabel>
-									<FormControl>
-										<Input
-											type="number"
-											disabled={mutation.isPending}
-											placeholder="10"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+					<div className="grid gap-8 md:grid-cols-3">
+						<div className="md:col-span-2 space-y-8">
+							<FormField
+								control={form.control}
+								name="name"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Name</FormLabel>
+										<FormControl>
+											<Input
+												disabled={mutation.isPending}
+												placeholder="Product name"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="description"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Description</FormLabel>
+										<FormControl>
+											<Editor
+												{...field}
+												onChange={(value) => field.onChange(value)}
+												disabled={mutation.isPending}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+						<div className="space-y-8">
+							<FormField
+								control={form.control}
+								name="price"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Price</FormLabel>
+										<FormControl>
+											<Input
+												type="number"
+												disabled={mutation.isPending}
+												placeholder="9.99"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="stock"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Stock</FormLabel>
+										<FormControl>
+											<Input
+												type="number"
+												disabled={mutation.isPending}
+												placeholder="10"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
 					</div>
-					<FormField
-						control={form.control}
-						name="description"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Description</FormLabel>
-								<FormControl>
-									<Input
-										disabled={mutation.isPending}
-										placeholder="Product description"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
 					<Button
 						disabled={mutation.isPending}
 						className="ml-auto"
