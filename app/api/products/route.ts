@@ -9,6 +9,8 @@ export async function GET(request: Request) {
 		const { searchParams } = new URL(request.url);
 		const search = searchParams.get("search") || "";
 
+		const brandId = searchParams.get("brandId");
+
 		const { page, limit } = paginationSchema.parse({
 			page: searchParams.get("page"),
 			limit: searchParams.get("limit"),
@@ -16,14 +18,19 @@ export async function GET(request: Request) {
 
 		const skip = (page - 1) * limit;
 
-		const where = search
-			? {
-					OR: [
-						{ name: { contains: search, mode: "insensitive" as const } },
-						{ description: { contains: search, mode: "insensitive" as const } },
-					],
-			  }
-			: {};
+		const where = {
+			...(search
+				? {
+						OR: [
+							{ name: { contains: search, mode: "insensitive" as const } },
+							{
+								description: { contains: search, mode: "insensitive" as const },
+							},
+						],
+				  }
+				: {}),
+			...(brandId ? { brandId } : {}),
+		};
 
 		const [products, total] = await Promise.all([
 			prisma.product.findMany({
@@ -49,6 +56,12 @@ export async function GET(request: Request) {
 			},
 		});
 	} catch (error) {
+		if (error instanceof z.ZodError) {
+			return NextResponse.json(
+				{ error: (error as any).errors },
+				{ status: 400 }
+			);
+		}
 		console.error("Failed to fetch products:", error);
 		return NextResponse.json(
 			{ error: "Failed to fetch products" },

@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,14 @@ import { toast } from "sonner";
 import { productSchema, ProductFormValues } from "@/schemas/product";
 import api from "@/lib/axios";
 import { getErrorMessage } from "@/utils/error";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { Brand } from "@prisma/client";
 
 interface ProductFormProps {
 	initialData?: ProductFormValues & { id: string };
@@ -40,10 +48,19 @@ export function ProductForm({ initialData }: ProductFormProps) {
 			price: 0,
 			stock: 0,
 			images: [],
+			brandId: "",
 		},
 	});
 
 	const queryClient = useQueryClient();
+
+	const { data: brands } = useQuery({
+		queryKey: ["brands-list"],
+		queryFn: async () => {
+			const res = await api.get("/brands?limit=100"); // Fetch all brands (or enough for dropdown)
+			return res.data.data as Brand[];
+		},
+	});
 
 	const mutation = useMutation({
 		mutationFn: async (data: ProductFormValues) => {
@@ -141,6 +158,34 @@ export function ProductForm({ initialData }: ProductFormProps) {
 							/>
 						</div>
 						<div className="space-y-8">
+							<FormField
+								control={form.control}
+								name="brandId"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Brand</FormLabel>
+										<Select
+											disabled={mutation.isPending}
+											onValueChange={field.onChange}
+											value={field.value}
+											defaultValue={field.value}>
+											<FormControl>
+												<SelectTrigger>
+													<SelectValue placeholder="Select a brand" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{brands?.map((brand) => (
+													<SelectItem key={brand.id} value={brand.id}>
+														{brand.name}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 							<FormField
 								control={form.control}
 								name="price"

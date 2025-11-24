@@ -12,46 +12,33 @@ import { toast } from "sonner";
 import api from "@/lib/axios";
 import { useUrlParams } from "@/hooks/use-url-params";
 import { useConfirm } from "@/hooks/use-confirm";
-import { formatCurrency, formatDate } from "@/utils/format";
-import { Product, Brand } from "@prisma/client";
-import { SearchInput } from "@/components/ui/search-input";
-import { FilterSelect } from "@/components/ui/filter-select";
+import { formatDate } from "@/utils/format";
+import { Brand } from "@prisma/client";
 
-export default function ProductsPage() {
-	const [params, setParams] = useUrlParams({
-		page: 1,
-		limit: 10,
-		search: "",
-		brandId: "",
-	});
+import { SearchInput } from "@/components/ui/search-input";
+
+export default function BrandsPage() {
+	const [params, setParams] = useUrlParams({ page: 1, limit: 10, search: "" });
 	const confirm = useConfirm();
 	const queryClient = useQueryClient();
 
 	const { data, isLoading } = useQuery({
-		queryKey: ["products", params],
+		queryKey: ["brands", params],
 		queryFn: async () => {
-			const res = await api.get(`/products`, {
+			const res = await api.get(`/brands`, {
 				params,
 			});
 			return res.data;
 		},
 	});
 
-	const { data: brands } = useQuery({
-		queryKey: ["brands-list"],
-		queryFn: async () => {
-			const res = await api.get("/brands?limit=100");
-			return res.data.data as Brand[];
-		},
-	});
-
 	const deleteMutation = useMutation({
 		mutationFn: async (id: string) => {
-			await api.delete(`/products/${id}`);
+			await api.delete(`/brands/${id}`);
 		},
 		onSuccess: () => {
-			toast.success("Product deleted");
-			queryClient.invalidateQueries({ queryKey: ["products"] });
+			toast.success("Brand deleted");
+			queryClient.invalidateQueries({ queryKey: ["brands"] });
 		},
 		onError: () => {
 			toast.error("Something went wrong");
@@ -65,13 +52,12 @@ export default function ProductsPage() {
 		}
 	};
 
-	const columns: ColumnDef<Product>[] = [
+	const columns: ColumnDef<Brand>[] = [
 		{
-			accessorKey: "images",
+			accessorKey: "image",
 			header: "Image",
 			cell: ({ row }) => {
-				const images = row.getValue("images") as string[];
-				const image = images?.[0];
+				const image = row.getValue("image") as string;
 				return (
 					<div className="relative h-10 w-10 overflow-hidden rounded-md border">
 						{image ? (
@@ -95,17 +81,6 @@ export default function ProductsPage() {
 			header: "Name",
 		},
 		{
-			accessorKey: "price",
-			header: "Price",
-			cell: ({ row }) => {
-				return <div>{formatCurrency(row.getValue("price"))}</div>;
-			},
-		},
-		{
-			accessorKey: "stock",
-			header: "Stock",
-		},
-		{
 			accessorKey: "createdAt",
 			header: "Date",
 			cell: ({ row }) => {
@@ -122,7 +97,7 @@ export default function ProductsPage() {
 				return (
 					<div className="flex items-center gap-2">
 						<Button variant="ghost" size="icon" asChild>
-							<Link href={`/admin/products/${row.original.id}`}>
+							<Link href={`/admin/brands/${row.original.id}`}>
 								<Pencil className="h-4 w-4" />
 							</Link>
 						</Button>
@@ -141,21 +116,16 @@ export default function ProductsPage() {
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
-				<h2 className="text-3xl font-bold tracking-tight">Products</h2>
+				<h2 className="text-3xl font-bold tracking-tight">Brands</h2>
 				<Button asChild>
-					<Link href="/admin/products/create">
+					<Link href="/admin/brands/create">
 						<Plus className="mr-2 h-4 w-4" /> Add New
 					</Link>
 				</Button>
 			</div>
 
 			<div className="flex items-center gap-4">
-				<SearchInput placeholder="Search products..." />
-				<FilterSelect
-					paramName="brandId"
-					placeholder="Filter by Brand"
-					options={brands?.map((b) => ({ label: b.name, value: b.id })) || []}
-				/>
+				<SearchInput placeholder="Search brands..." />
 			</div>
 
 			<DataTable
