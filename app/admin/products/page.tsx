@@ -24,7 +24,7 @@ type Product = {
 export default function ProductsPage() {
 	const { getParam, setParam } = useUrlParams();
 	const page = parseInt(getParam("page") || "1");
-	const [ConfirmDialog, confirm] = useConfirm();
+	const confirm = useConfirm();
 	const queryClient = useQueryClient();
 
 	const { data, isLoading } = useQuery({
@@ -102,7 +102,6 @@ export default function ProductsPage() {
 
 	return (
 		<div className="space-y-4">
-			<ConfirmDialog />
 			<div className="flex items-center justify-between">
 				<h2 className="text-3xl font-bold tracking-tight">Products</h2>
 				<Button asChild>
