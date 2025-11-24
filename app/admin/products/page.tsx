@@ -22,15 +22,16 @@ type Product = {
 };
 
 export default function ProductsPage() {
-	const { getParam, setParam } = useUrlParams();
-	const page = parseInt(getParam("page") || "1");
+	const [params, setParams] = useUrlParams({ page: 1, limit: 10 });
 	const confirm = useConfirm();
 	const queryClient = useQueryClient();
 
 	const { data, isLoading } = useQuery({
-		queryKey: ["products", page],
+		queryKey: ["products", params],
 		queryFn: async () => {
-			const res = await api.get(`/products?page=${page}&limit=10`);
+			const res = await api.get(`/products`, {
+				params,
+			});
 			return res.data;
 		},
 	});
@@ -111,18 +112,20 @@ export default function ProductsPage() {
 				</Button>
 			</div>
 
-			{isLoading ? (
-				<div>Loading...</div>
-			) : (
-				<>
-					<DataTable columns={columns} data={data?.data || []} />
-					{data?.meta && (
-						<Pagination
-							meta={data.meta}
-							onPageChange={(p) => setParam("page", p)}
-						/>
-					)}
-				</>
+			<DataTable
+				columns={columns}
+				data={data?.data || []}
+				isLoading={isLoading}
+				loadingRows={params.limit}
+			/>
+			{data?.meta && (
+				<Pagination
+					meta={data.meta}
+					limit={params.limit}
+					onChange={(newParams) => {
+						setParams((prev) => ({ ...prev, ...newParams }));
+					}}
+				/>
 			)}
 		</div>
 	);

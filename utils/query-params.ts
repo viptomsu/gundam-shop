@@ -17,3 +17,9 @@ export const stringifyQuery = (query: Record<string, any>) => {
 		skipEmptyString: true,
 	});
 };
+export const parseQuery = (query: string) => {
+	return queryString.parse(query, {
+		parseNumbers: true,
+		parseBooleans: true,
+	});
+};
