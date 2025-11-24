@@ -95,6 +95,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 												field.value.filter((current) => current !== url)
 											)
 										}
+										folder="gundam/products"
 									/>
 								</FormControl>
 								<FormMessage />

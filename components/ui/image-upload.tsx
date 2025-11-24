@@ -11,6 +11,7 @@ interface ImageUploadProps {
 	onChange: (value: string[]) => void;
 	onRemove: (value: string) => void;
 	value: string[];
+	folder?: string;
 }
 
 export function ImageUpload({
@@ -18,6 +19,7 @@ export function ImageUpload({
 	onChange,
 	onRemove,
 	value,
+	folder,
 }: ImageUploadProps) {
 	const [isUploading, setIsUploading] = useState(false);
 
@@ -29,6 +31,9 @@ export function ImageUpload({
 			setIsUploading(true);
 			const formData = new FormData();
 			formData.append("file", file);
+			if (folder) {
+				formData.append("folder", folder);
+			}
 
 			const response = await fetch("/api/upload", {
 				method: "POST",
