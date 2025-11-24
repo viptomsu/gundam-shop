@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
 
 export default function AdminLayout({
 	children,
@@ -7,20 +6,14 @@ export default function AdminLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="flex min-h-screen flex-col">
-			<header className="border-b">
-				<div className="flex h-16 items-center px-4">
-					<div className="ml-auto flex items-center space-x-4">
-						<Button asChild variant="ghost">
-							<Link href="/admin/products">Products</Link>
-						</Button>
-						<Button asChild variant="ghost">
-							<Link href="/">Home</Link>
-						</Button>
-					</div>
-				</div>
-			</header>
-			<div className="flex-1 space-y-4 p-8 pt-6">{children}</div>
+		<div className="h-full relative">
+			<div className="hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-[80] bg-gray-900">
+				<AdminSidebar />
+			</div>
+			<main className="md:pl-72">
+				{/* Header can go here if we want a top bar for user profile etc, but for now just content */}
+				<div className="p-4">{children}</div>
+			</main>
 		</div>
 	);
 }

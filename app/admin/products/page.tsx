@@ -6,20 +6,14 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Pagination } from "@/components/ui/pagination";
 import { toast } from "sonner";
 import api from "@/lib/axios";
 import { useUrlParams } from "@/hooks/use-url-params";
 import { useConfirm } from "@/hooks/use-confirm";
 import { formatCurrency, formatDate } from "@/utils/format";
-
-type Product = {
-	id: string;
-	name: string;
-	price: number;
-	stock: number;
-	createdAt: string;
-};
+import { Product } from "@prisma/client";
 
 export default function ProductsPage() {
 	const [params, setParams] = useUrlParams({ page: 1, limit: 10 });
@@ -58,6 +52,30 @@ export default function ProductsPage() {
 
 	const columns: ColumnDef<Product>[] = [
 		{
+			accessorKey: "images",
+			header: "Image",
+			cell: ({ row }) => {
+				const images = row.getValue("images") as string[];
+				const image = images?.[0];
+				return (
+					<div className="relative h-10 w-10 overflow-hidden rounded-md border">
+						{image ? (
+							<Image
+								src={image}
+								alt={row.getValue("name")}
+								fill
+								className="object-cover"
+							/>
+						) : (
+							<div className="flex h-full w-full items-center justify-center bg-secondary text-xs text-muted-foreground">
+								No img
+							</div>
+						)}
+					</div>
+				);
+			},
+		},
+		{
 			accessorKey: "name",
 			header: "Name",
 		},
@@ -81,6 +99,10 @@ export default function ProductsPage() {
 		},
 		{
 			id: "actions",
+			header: "Actions",
+			meta: {
+				className: "w-25",
+			},
 			cell: ({ row }) => {
 				return (
 					<div className="flex items-center gap-2">
