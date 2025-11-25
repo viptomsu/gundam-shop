@@ -81,7 +81,7 @@
 	--destructive-foreground: #ffffff;
 
 	/* BORDERS & INPUTS (Panel Lines) */
-	--border: #2a2b36;
+	--border: #3f4152;
 	--input: #1e293b;
 
 	/* RING (Hiệu ứng phát sáng khi Focus) */
@@ -94,7 +94,7 @@
 	--sidebar-primary-foreground: #000000;
 	--sidebar-accent: #1e293b;
 	--sidebar-accent-foreground: #e2e8f0;
-	--sidebar-border: #2a2b36;
+	--sidebar-border: #3f4152;
 	--sidebar-ring: #00e1ff;
 }
 
@@ -226,7 +226,7 @@
 	}
 
 	.tech-input-base {
-		@apply relative transition-all duration-300 border border-white/20 bg-transparent rounded-none;
+		@apply relative transition-all duration-300 border border-border bg-transparent rounded-none;
 		background-image: linear-gradient(var(--accent), var(--accent)),
 			linear-gradient(var(--accent), var(--accent)),
 			linear-gradient(var(--accent), var(--accent)),

@@ -13,28 +13,59 @@ import api from "@/lib/axios";
 import { useUrlParams } from "@/hooks/use-url-params";
 import { useConfirm } from "@/hooks/use-confirm";
 import { formatCurrency, formatDate } from "@/utils/format";
-import { Product, Brand, Category } from "@prisma/client";
+import { Product, Brand, Category, ProductVariant } from "@prisma/client";
 import { SearchInput } from "@/components/ui/search-input";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { FilterSelect } from "@/components/ui/filter-select";
 import { Badge } from "@/components/ui/badge";
+import { Toggle } from "@/components/ui/toggle";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Star, Archive } from "lucide-react";
 import { GUNDAM_GRADES, GUNDAM_SCALES } from "@/config/constants";
 
 import { useBrands } from "@/hooks/queries/use-brands";
 import { useCategories } from "@/hooks/queries/use-categories";
 import { useSeries } from "@/hooks/queries/use-series";
 
-type ProductWithCategories = Product & { categories: Category[] };
+type ProductWithRelations = Product & {
+	categories: Category[];
+	variants: ProductVariant[];
+	totalStock: number;
+	minPrice: number;
+	maxPrice: number;
+	variantCount: number;
+};
+
+interface ProductParams {
+	page: number;
+	limit: number;
+	search: string;
+	brandId: string[];
+	seriesId: string[];
+	categoryId: string[];
+	grade: string[];
+	scale: string[];
+	isFeatured?: boolean;
+	isArchived?: boolean;
+}
 
 export default function ProductsPage() {
-	const [params, setParams] = useUrlParams({
+	const [params, setParams] = useUrlParams<ProductParams>({
 		page: 1,
 		limit: 10,
 		search: "",
-		brandId: "",
-		seriesId: "",
-		categoryId: "",
-		grade: "",
-		scale: "",
+		brandId: [],
+		seriesId: [],
+		categoryId: [],
+		grade: [],
+		scale: [],
+		isFeatured: undefined,
+		isArchived: undefined,
 	});
 	const confirm = useConfirm();
 	const queryClient = useQueryClient();
@@ -73,7 +104,7 @@ export default function ProductsPage() {
 		}
 	};
 
-	const columns: ColumnDef<ProductWithCategories>[] = [
+	const columns: ColumnDef<ProductWithRelations>[] = [
 		{
 			accessorKey: "images",
 			header: "Image",
@@ -119,21 +150,26 @@ export default function ProductsPage() {
 			},
 		},
 		{
-			accessorKey: "price",
-			header: "Price",
+			accessorKey: "variants",
+			header: "Variants",
 			cell: ({ row }) => {
+				const { totalStock, minPrice, maxPrice, variantCount } = row.original;
+
 				return (
-					<div className="font-mono">
-						{formatCurrency(row.getValue("price"))}
+					<div className="flex flex-col text-sm">
+						<span className="font-medium">
+							{variantCount} variant{variantCount !== 1 && "s"}
+						</span>
+						<span className="text-muted-foreground text-xs">
+							Stock: {totalStock}
+						</span>
+						<span className="text-muted-foreground text-xs">
+							{minPrice > 0
+								? `${formatCurrency(minPrice)} - ${formatCurrency(maxPrice)}`
+								: "No price"}
+						</span>
 					</div>
 				);
-			},
-		},
-		{
-			accessorKey: "stock",
-			header: "Stock",
-			cell: ({ row }) => {
-				return <div className="font-mono">{row.getValue("stock")}</div>;
 			},
 		},
 		{
@@ -141,6 +177,43 @@ export default function ProductsPage() {
 			header: "Date",
 			cell: ({ row }) => {
 				return formatDate(row.getValue("createdAt"));
+			},
+		},
+		{
+			accessorKey: "isFeatured",
+			header: "Featured",
+			cell: ({ row }) => {
+				return (
+					<Badge variant={row.original.isFeatured ? "default" : "secondary"}>
+						{row.original.isFeatured ? "Yes" : "No"}
+					</Badge>
+				);
+			},
+		},
+		{
+			accessorKey: "isArchived",
+			header: "Archived",
+			cell: ({ row }) => {
+				return (
+					<Badge
+						variant={row.original.isArchived ? "destructive" : "secondary"}>
+						{row.original.isArchived ? "Yes" : "No"}
+					</Badge>
+				);
+			},
+		},
+		{
+			accessorKey: "rating",
+			header: "Rating",
+			cell: ({ row }) => {
+				return (
+					<div className="flex flex-col text-sm">
+						<span>{row.original.rating.toFixed(1)} / 5</span>
+						<span className="text-xs text-muted-foreground">
+							({row.original.numReviews} reviews)
+						</span>
+					</div>
+				);
 			},
 		},
 		{
@@ -181,40 +254,114 @@ export default function ProductsPage() {
 				</Button>
 			</div>
 
-			<div className="flex items-center gap-4 flex-wrap">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 				<SearchInput placeholder="Search products..." />
-				<FilterSelect
-					paramName="brandId"
+				<MultiSelect
 					placeholder="Filter by Brand"
 					options={brands?.map((b) => ({ label: b.name, value: b.id })) || []}
+					value={params.brandId || []}
+					onValueChange={(value) =>
+						setParams((prev) => ({ ...prev, brandId: value, page: 1 }))
+					}
 				/>
-				<FilterSelect
-					paramName="seriesId"
+				<MultiSelect
 					placeholder="Filter by Series"
 					options={series?.map((s) => ({ label: s.name, value: s.id })) || []}
+					value={params.seriesId || []}
+					onValueChange={(value) =>
+						setParams((prev) => ({ ...prev, seriesId: value, page: 1 }))
+					}
 				/>
-				<FilterSelect
-					paramName="categoryId"
+				<MultiSelect
 					placeholder="Filter by Category"
 					options={
 						categories?.map((c) => ({ label: c.name, value: c.id })) || []
 					}
+					value={params.categoryId || []}
+					onValueChange={(value) =>
+						setParams((prev) => ({ ...prev, categoryId: value, page: 1 }))
+					}
 				/>
-				<FilterSelect
-					paramName="grade"
+				<MultiSelect
 					placeholder="Filter by Grade"
 					options={GUNDAM_GRADES}
+					value={params.grade || []}
+					onValueChange={(value) =>
+						setParams((prev) => ({ ...prev, grade: value, page: 1 }))
+					}
 				/>
-				<FilterSelect
-					paramName="scale"
+				<MultiSelect
 					placeholder="Filter by Scale"
 					options={GUNDAM_SCALES}
+					value={params.scale || []}
+					onValueChange={(value) =>
+						setParams((prev) => ({ ...prev, scale: value, page: 1 }))
+					}
 				/>
+				<div className="flex items-center gap-2">
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Toggle
+									variant="outline"
+									aria-label="Toggle featured"
+									pressed={params.isFeatured === true}
+									onPressedChange={(pressed) => {
+										setParams((prev) => {
+											const newParams = { ...prev };
+											if (pressed) {
+												newParams.isFeatured = true;
+											} else {
+												newParams.isFeatured = undefined;
+											}
+											return { ...newParams, page: 1 };
+										});
+									}}>
+									<Star
+										className={`h-4 w-4 ${
+											params.isFeatured === true ? "fill-current" : ""
+										}`}
+									/>
+								</Toggle>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>Filter by Featured</p>
+							</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Toggle
+									variant="outline"
+									aria-label="Toggle archived"
+									pressed={params.isArchived === true}
+									onPressedChange={(pressed) => {
+										setParams((prev) => {
+											const newParams = { ...prev };
+											if (pressed) {
+												newParams.isArchived = true;
+											} else {
+												newParams.isArchived = undefined;
+											}
+											return { ...newParams, page: 1 };
+										});
+									}}>
+									<Archive className="h-4 w-4" />
+								</Toggle>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>Filter by Archived</p>
+							</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+				</div>
 			</div>
 
 			<DataTable
 				columns={columns}
-				data={(data?.data as ProductWithCategories[]) || []}
+				data={(data?.data as ProductWithRelations[]) || []}
 				isLoading={isLoading}
 				loadingRows={params.limit}
 			/>

@@ -20,6 +20,7 @@ export const productSchema = z.object({
 				price: z.coerce.number().min(0, "Price must be non-negative"),
 				stock: z.coerce.number().int().min(0, "Stock must be non-negative"),
 				image: z.url().optional(),
+				isArchived: z.boolean().default(false).optional(),
 			})
 		)
 		.min(1, "At least one variant is required"),

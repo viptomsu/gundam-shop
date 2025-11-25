@@ -115,6 +115,9 @@ model Product {
    grade String? // HG, MG, PG...
    scale String? // 1/144, 1/100...
 
+   rating     Float @default(0)
+   numReviews Int   @default(0)
+
    isFeatured Boolean @default(false)
    isArchived Boolean @default(false) // Ẩn sản phẩm
 
@@ -146,6 +149,8 @@ model ProductVariant {
    stock Int     @default(0)
 
    image String? // Ảnh đại diện riêng cho biến thể này
+
+   isArchived Boolean @default(false)
 
    productId String
    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)

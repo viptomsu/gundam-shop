@@ -4,9 +4,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { parseQuery, stringifyUrl } from "@/utils/query-params";
 
-export function useUrlParams<T = Record<string, string | number | boolean>>(
-	defaultValues?: Partial<T>
-) {
+export function useUrlParams<
+	T = Record<string, string | number | boolean | string[]>
+>(defaultValues?: Partial<T>) {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();

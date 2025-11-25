@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { RiCloseLine } from "react-icons/ri";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -86,7 +85,7 @@ export function TagInput({
 							size="icon"
 							className="h-3 w-3 p-0"
 							onClick={() => handleUnselect(item)}>
-							<RiCloseLine className="h-3 w-3" />
+							<X className="h-3 w-3" />
 							<span className="sr-only">Remove {item.label}</span>
 						</Button>
 					</Badge>

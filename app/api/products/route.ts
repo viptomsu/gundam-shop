@@ -9,8 +9,14 @@ export async function GET(request: Request) {
 		const { searchParams } = new URL(request.url);
 		const search = searchParams.get("search") || "";
 
-		const brandId = searchParams.get("brandId");
-		const categoryId = searchParams.get("categoryId");
+		const brandIds = searchParams.getAll("brandId");
+		const categoryIds = searchParams.getAll("categoryId");
+		const seriesIds = searchParams.getAll("seriesId");
+		const grades = searchParams.getAll("grade");
+		const scales = searchParams.getAll("scale");
+
+		const isFeatured = searchParams.get("isFeatured");
+		const isArchived = searchParams.get("isArchived");
 
 		const { page, limit } = paginationSchema.parse({
 			page: searchParams.get("page"),
@@ -19,20 +25,24 @@ export async function GET(request: Request) {
 
 		const skip = (page - 1) * limit;
 
-		const where = {
-			...(search
-				? {
-						OR: [
-							{ name: { contains: search, mode: "insensitive" as const } },
-							{
-								description: { contains: search, mode: "insensitive" as const },
-							},
-						],
-				  }
-				: {}),
-			...(brandId ? { brandId } : {}),
-			...(categoryId ? { categories: { some: { id: categoryId } } } : {}),
-		};
+		const where: any = {};
+
+		if (search) {
+			where.OR = [
+				{ name: { contains: search, mode: "insensitive" as const } },
+				{ description: { contains: search, mode: "insensitive" as const } },
+			];
+		}
+
+		if (brandIds.length > 0) where.brandId = { in: brandIds };
+		if (seriesIds.length > 0) where.seriesId = { in: seriesIds };
+		if (categoryIds.length > 0)
+			where.categories = { some: { id: { in: categoryIds } } };
+		if (grades.length > 0) where.grade = { in: grades };
+		if (scales.length > 0) where.scale = { in: scales };
+
+		if (isFeatured !== null) where.isFeatured = isFeatured === "true";
+		if (isArchived !== null) where.isArchived = isArchived === "true";
 
 		const [products, total] = await Promise.all([
 			prisma.product.findMany({
@@ -40,15 +50,31 @@ export async function GET(request: Request) {
 				skip,
 				take: limit,
 				orderBy: { createdAt: "desc" },
-				include: { categories: true, brand: true },
+				include: { categories: true, brand: true, variants: true },
 			}),
 			prisma.product.count({ where }),
 		]);
 
+		const enrichedProducts = products.map((product) => {
+			const variants = product.variants;
+			const totalStock = variants.reduce((acc, v) => acc + v.stock, 0);
+			const prices = variants.map((v) => Number(v.price));
+			const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
+			const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
+
+			return {
+				...product,
+				totalStock,
+				minPrice,
+				maxPrice,
+				variantCount: variants.length,
+			};
+		});
+
 		const totalPages = Math.ceil(total / limit);
 
 		return NextResponse.json({
-			data: products,
+			data: enrichedProducts,
 			meta: {
 				page,
 				limit,

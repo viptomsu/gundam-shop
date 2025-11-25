@@ -14,6 +14,7 @@ import {
 	FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Editor } from "@/components/ui/editor";
 import { useRouter } from "next/navigation";
@@ -21,7 +22,7 @@ import { toast } from "sonner";
 import { productSchema, ProductFormValues } from "@/schemas/product";
 import api from "@/lib/axios";
 import { getErrorMessage } from "@/utils/error";
-import { TagInput } from "@/components/ui/tag-input";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { GradeSelect } from "@/components/admin/grade-select";
 import { ScaleSelect } from "@/components/admin/scale-select";
 import { Plus, Trash } from "lucide-react";
@@ -62,6 +63,8 @@ export function ProductForm({ initialData }: ProductFormProps) {
 			categoryIds: [],
 			grade: "",
 			scale: "",
+			isFeatured: false,
+			isArchived: false,
 			variants: [
 				{
 					name: "Default",
@@ -69,6 +72,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 					price: 0,
 					stock: 0,
 					image: "",
+					isArchived: false,
 				},
 			],
 		},
@@ -278,7 +282,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 									<FormItem>
 										<FormLabel>Categories</FormLabel>
 										<FormControl>
-											<TagInput
+											<MultiSelect
 												placeholder="Select categories..."
 												options={
 													categories?.map((c) => ({
@@ -287,8 +291,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 													})) || []
 												}
 												value={field.value || []}
-												onChange={field.onChange}
-												disabled={mutation.isPending}
+												onValueChange={field.onChange}
 											/>
 										</FormControl>
 										<FormMessage />
@@ -334,6 +337,65 @@ export function ProductForm({ initialData }: ProductFormProps) {
 						</div>
 					</div>
 
+					<div className="grid gap-8 md:grid-cols-3">
+						<FormField
+							control={form.control}
+							name="isFeatured"
+							render={({ field }) => (
+								<Card className="p-4">
+									<FormItem className="flex flex-row items-start space-x-3 space-y-0">
+										<FormControl>
+											<Checkbox
+												checked={field.value}
+												onCheckedChange={field.onChange}
+											/>
+										</FormControl>
+										<div className="space-y-1 leading-none">
+											<FormLabel>Featured</FormLabel>
+											<FormDescription>
+												This product will appear on the home page
+											</FormDescription>
+										</div>
+									</FormItem>
+								</Card>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="isArchived"
+							render={({ field }) => (
+								<Card className="p-4" variant="accent">
+									<FormItem className="flex flex-row items-start space-x-3 space-y-0">
+										<FormControl>
+											<Checkbox
+												color="accent"
+												checked={field.value}
+												onCheckedChange={field.onChange}
+											/>
+										</FormControl>
+										<div className="space-y-1 leading-none">
+											<FormLabel>Archived</FormLabel>
+											<FormDescription>
+												This product will not appear anywhere in the store
+											</FormDescription>
+										</div>
+									</FormItem>
+								</Card>
+							)}
+						/>
+						{initialData && (
+							<div className="rounded-md border p-4">
+								<div className="space-y-1">
+									<h4 className="text-sm font-medium leading-none">Rating</h4>
+									<p className="text-sm text-muted-foreground">
+										{(initialData as any).rating?.toFixed(1) || "0.0"} / 5 (
+										{(initialData as any).numReviews || 0} reviews)
+									</p>
+								</div>
+							</div>
+						)}
+					</div>
+
 					<Separator />
 
 					<div className="space-y-4">
@@ -350,6 +412,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 										price: 0,
 										stock: 0,
 										image: "",
+										isArchived: false,
 									})
 								}>
 								<Plus className="mr-2 h-4 w-4" />
@@ -358,10 +421,26 @@ export function ProductForm({ initialData }: ProductFormProps) {
 						</div>
 						<div className="space-y-4">
 							{fields.map((field, index) => (
-								<Card key={field.id}>
-									<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+								<Card key={field.id} variant="accent">
+									<CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 pb-2">
 										<CardTitle className="text-sm font-medium">
-											Variant {index + 1}
+											<FormField
+												control={form.control}
+												name={`variants.${index}.name`}
+												render={({ field }) => (
+													<FormItem className="flex flex-row items-center gap-2">
+														<FormLabel>Name</FormLabel>
+														<FormControl>
+															<Input
+																disabled={mutation.isPending}
+																placeholder="Variant name"
+																{...field}
+															/>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
 										</CardTitle>
 										<Button
 											type="button"
@@ -372,98 +451,101 @@ export function ProductForm({ initialData }: ProductFormProps) {
 											<Trash className="h-4 w-4 text-destructive" />
 										</Button>
 									</CardHeader>
-									<CardContent className="grid gap-4 md:grid-cols-5">
-										<FormField
-											control={form.control}
-											name={`variants.${index}.name`}
-											render={({ field }) => (
-												<FormItem className="md:col-span-2">
-													<FormLabel>Name</FormLabel>
-													<FormControl>
-														<Input
-															disabled={mutation.isPending}
-															placeholder="Variant Name"
-															{...field}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`variants.${index}.sku`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>SKU</FormLabel>
-													<FormControl>
-														<Input
-															disabled={mutation.isPending}
-															placeholder="SKU"
-															{...field}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`variants.${index}.price`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Price</FormLabel>
-													<FormControl>
-														<Input
-															type="number"
-															disabled={mutation.isPending}
-															placeholder="0.00"
-															{...field}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`variants.${index}.stock`}
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>Stock</FormLabel>
-													<FormControl>
-														<Input
-															type="number"
-															disabled={mutation.isPending}
-															placeholder="0"
-															{...field}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name={`variants.${index}.image`}
-											render={({ field }) => (
-												<FormItem className="md:col-span-5">
-													<FormLabel>Variant Image</FormLabel>
-													<FormControl>
-														<ImageUpload
-															value={field.value ? [field.value] : []}
-															disabled={mutation.isPending}
-															onChange={(urls) =>
-																field.onChange(urls[urls.length - 1])
-															}
-															onRemove={() => field.onChange("")}
-															folder="gundam/variants"
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
+									<CardContent className="grid gap-4 p-4 md:grid-cols-3">
+										<div className="md:col-span-1">
+											<FormField
+												control={form.control}
+												name={`variants.${index}.image`}
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>Variant Image</FormLabel>
+														<FormControl>
+															<ImageUpload
+																value={field.value ? [field.value] : []}
+																disabled={mutation.isPending}
+																onChange={(url) => field.onChange(url)}
+																onRemove={() => field.onChange("")}
+															/>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+										</div>
+
+										<div className="grid gap-4 md:col-span-2 md:grid-cols-3">
+											<FormField
+												control={form.control}
+												name={`variants.${index}.sku`}
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>SKU</FormLabel>
+														<FormControl>
+															<Input
+																disabled={mutation.isPending}
+																placeholder="SKU"
+																{...field}
+															/>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											<FormField
+												control={form.control}
+												name={`variants.${index}.price`}
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>Price</FormLabel>
+														<FormControl>
+															<Input
+																type="number"
+																disabled={mutation.isPending}
+																placeholder="Price"
+																{...field}
+															/>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											<FormField
+												control={form.control}
+												name={`variants.${index}.stock`}
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>Stock</FormLabel>
+														<FormControl>
+															<Input
+																type="number"
+																disabled={mutation.isPending}
+																placeholder="Stock"
+																{...field}
+															/>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+											<FormField
+												control={form.control}
+												name={`variants.${index}.isArchived`}
+												render={({ field }) => (
+													<FormItem className="flex flex-row items-center space-x-2 space-y-0 md:col-span-2">
+														<FormControl>
+															<Checkbox
+																color="accent"
+																checked={field.value}
+																onCheckedChange={field.onChange}
+															/>
+														</FormControl>
+														<div className="space-y-1 leading-none">
+															<FormLabel>Archived</FormLabel>
+														</div>
+													</FormItem>
+												)}
+											/>
+										</div>
 									</CardContent>
 								</Card>
 							))}

@@ -1,15 +1,34 @@
 import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+const cardVariants = cva(
+	"bg-card text-card-foreground flex flex-col gap-6 border border-primary/20 py-6 shadow-sm relative overflow-hidden transition-all duration-300",
+	{
+		variants: {
+			variant: {
+				default:
+					"has-data-[state=checked]:border-primary has-data-[state=checked]:shadow-[0_0_15px_rgba(6,182,212,0.3)]",
+				accent:
+					"has-data-[state=checked]:border-accent has-data-[state=checked]:shadow-[0_0_15px_rgba(255,215,0,0.3)]",
+			},
+		},
+		defaultVariants: {
+			variant: "default",
+		},
+	}
+);
+
+function Card({
+	className,
+	variant,
+	...props
+}: React.ComponentProps<"div"> & VariantProps<typeof cardVariants>) {
 	return (
 		<div
 			data-slot="card"
-			className={cn(
-				"bg-card text-card-foreground flex flex-col gap-6 border border-primary/20 py-6 shadow-sm relative overflow-hidden",
-				className
-			)}
+			className={cn(cardVariants({ variant }), className)}
 			{...props}>
 			<div className="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-primary/50 rounded-tr-none clip-mecha pointer-events-none opacity-50" />
 			{props.children}
