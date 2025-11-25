@@ -11,6 +11,7 @@ export async function GET(
 		const { id } = await params;
 		const product = await prisma.product.findUnique({
 			where: { id },
+			include: { categories: true, brand: true },
 		});
 
 		if (!product) {
@@ -36,9 +37,16 @@ export async function PUT(
 		const body = await request.json();
 		const validatedData = productSchema.parse(body);
 
+		const { categoryIds, ...rest } = validatedData;
+
 		const product = await prisma.product.update({
 			where: { id },
-			data: validatedData,
+			data: {
+				...rest,
+				categories: {
+					set: categoryIds?.map((id) => ({ id })),
+				},
+			},
 		});
 
 		return NextResponse.json(product);

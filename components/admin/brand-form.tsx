@@ -92,8 +92,9 @@ export const BrandForm: React.FC<BrandFormProps> = ({ initialData }) => {
 									<ImageUpload
 										value={field.value ? [field.value] : []}
 										disabled={loading}
-										onChange={(url) => field.onChange(url)}
+										onChange={(url) => field.onChange(url[url.length - 1])}
 										onRemove={() => field.onChange("")}
+										folder="gundam/brands"
 									/>
 								</FormControl>
 								<FormMessage />

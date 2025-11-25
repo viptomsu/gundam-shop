@@ -28,6 +28,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Brand } from "@prisma/client";
+import { CategoryTagInput } from "@/components/admin/category-tag-input";
 
 interface ProductFormProps {
 	initialData?: ProductFormValues & { id: string };
@@ -49,6 +50,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 			stock: 0,
 			images: [],
 			brandId: "",
+			categoryIds: [],
 		},
 	});
 
@@ -182,6 +184,23 @@ export function ProductForm({ initialData }: ProductFormProps) {
 												))}
 											</SelectContent>
 										</Select>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="categoryIds"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Categories</FormLabel>
+										<FormControl>
+											<CategoryTagInput
+												value={field.value || []}
+												onChange={field.onChange}
+												disabled={mutation.isPending}
+											/>
+										</FormControl>
 										<FormMessage />
 									</FormItem>
 								)}

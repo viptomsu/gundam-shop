@@ -10,6 +10,7 @@ export async function GET(request: Request) {
 		const search = searchParams.get("search") || "";
 
 		const brandId = searchParams.get("brandId");
+		const categoryId = searchParams.get("categoryId");
 
 		const { page, limit } = paginationSchema.parse({
 			page: searchParams.get("page"),
@@ -30,6 +31,7 @@ export async function GET(request: Request) {
 				  }
 				: {}),
 			...(brandId ? { brandId } : {}),
+			...(categoryId ? { categories: { some: { id: categoryId } } } : {}),
 		};
 
 		const [products, total] = await Promise.all([
@@ -38,6 +40,7 @@ export async function GET(request: Request) {
 				skip,
 				take: limit,
 				orderBy: { createdAt: "desc" },
+				include: { categories: true, brand: true },
 			}),
 			prisma.product.count({ where }),
 		]);
@@ -75,8 +78,15 @@ export async function POST(request: Request) {
 		const body = await request.json();
 		const validatedData = productSchema.parse(body);
 
+		const { categoryIds, ...rest } = validatedData;
+
 		const product = await prisma.product.create({
-			data: validatedData,
+			data: {
+				...rest,
+				categories: {
+					connect: categoryIds?.map((id) => ({ id })),
+				},
+			},
 		});
 
 		return NextResponse.json(product, { status: 201 });

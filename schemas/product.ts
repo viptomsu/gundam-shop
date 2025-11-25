@@ -7,6 +7,7 @@ export const productSchema = z.object({
 	stock: z.coerce.number().int().min(0, "Stock must be non-negative"),
 	images: z.array(z.url()),
 	brandId: z.string().optional(),
+	categoryIds: z.array(z.string()).optional(),
 });
 
 export type ProductFormValues = z.infer<typeof productSchema>;

@@ -13,9 +13,12 @@ import api from "@/lib/axios";
 import { useUrlParams } from "@/hooks/use-url-params";
 import { useConfirm } from "@/hooks/use-confirm";
 import { formatCurrency, formatDate } from "@/utils/format";
-import { Product, Brand } from "@prisma/client";
+import { Product, Brand, Category } from "@prisma/client";
 import { SearchInput } from "@/components/ui/search-input";
 import { FilterSelect } from "@/components/ui/filter-select";
+import { Badge } from "@/components/ui/badge";
+
+type ProductWithCategories = Product & { categories: Category[] };
 
 export default function ProductsPage() {
 	const [params, setParams] = useUrlParams({
@@ -23,6 +26,7 @@ export default function ProductsPage() {
 		limit: 10,
 		search: "",
 		brandId: "",
+		categoryId: "",
 	});
 	const confirm = useConfirm();
 	const queryClient = useQueryClient();
@@ -42,6 +46,14 @@ export default function ProductsPage() {
 		queryFn: async () => {
 			const res = await api.get("/brands?limit=100");
 			return res.data.data as Brand[];
+		},
+	});
+
+	const { data: categories } = useQuery({
+		queryKey: ["categories-list"],
+		queryFn: async () => {
+			const res = await api.get("/categories?limit=100");
+			return res.data.data as Category[];
 		},
 	});
 
@@ -65,7 +77,7 @@ export default function ProductsPage() {
 		}
 	};
 
-	const columns: ColumnDef<Product>[] = [
+	const columns: ColumnDef<ProductWithCategories>[] = [
 		{
 			accessorKey: "images",
 			header: "Image",
@@ -93,6 +105,22 @@ export default function ProductsPage() {
 		{
 			accessorKey: "name",
 			header: "Name",
+		},
+		{
+			accessorKey: "categories",
+			header: "Categories",
+			cell: ({ row }) => {
+				const categories = row.original.categories as Category[];
+				return (
+					<div className="flex flex-wrap gap-1">
+						{categories?.map((c) => (
+							<Badge key={c.id} variant="secondary" className="text-xs">
+								{c.name}
+							</Badge>
+						))}
+					</div>
+				);
+			},
 		},
 		{
 			accessorKey: "price",
@@ -156,11 +184,18 @@ export default function ProductsPage() {
 					placeholder="Filter by Brand"
 					options={brands?.map((b) => ({ label: b.name, value: b.id })) || []}
 				/>
+				<FilterSelect
+					paramName="categoryId"
+					placeholder="Filter by Category"
+					options={
+						categories?.map((c) => ({ label: c.name, value: c.id })) || []
+					}
+				/>
 			</div>
 
 			<DataTable
 				columns={columns}
-				data={data?.data || []}
+				data={(data?.data as ProductWithCategories[]) || []}
 				isLoading={isLoading}
 				loadingRows={params.limit}
 			/>

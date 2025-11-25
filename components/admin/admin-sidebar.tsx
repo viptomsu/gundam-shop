@@ -13,6 +13,7 @@ import {
 	Settings,
 	LogOut,
 	UserCircle,
+	Layers,
 } from "lucide-react";
 import { useAuth, useLogout } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -47,6 +48,12 @@ const routes = [
 		icon: Tags,
 		href: "/admin/brands",
 		color: "text-emerald-500",
+	},
+	{
+		label: "Categories",
+		icon: Layers,
+		href: "/admin/categories",
+		color: "text-cyan-500",
 	},
 	{
 		label: "Vouchers",
