@@ -250,7 +250,7 @@
 	.tech-input-base:focus-within,
 	.tech-input-base[data-state="open"],
 	.tech-input-base[aria-expanded="true"] {
-		@apply outline-none ring-0 shadow-none border-white/20;
+		@apply outline-none ring-0 shadow-none border-border;
 		background-size: 10px 2px, 2px 10px, 10px 2px, 2px 10px, 10px 2px, 2px 10px,
 			10px 2px, 2px 10px;
 
