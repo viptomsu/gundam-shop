@@ -114,7 +114,10 @@ export default function ProductsPage() {
 				return (
 					<div className="flex flex-wrap gap-1">
 						{categories?.map((c) => (
-							<Badge key={c.id} variant="secondary" className="text-xs">
+							<Badge
+								key={c.id}
+								variant="outline"
+								className="text-xs border-primary/50 text-primary bg-primary/5 rounded-none clip-mecha-sm">
 								{c.name}
 							</Badge>
 						))}
@@ -126,12 +129,19 @@ export default function ProductsPage() {
 			accessorKey: "price",
 			header: "Price",
 			cell: ({ row }) => {
-				return <div>{formatCurrency(row.getValue("price"))}</div>;
+				return (
+					<div className="font-mono">
+						{formatCurrency(row.getValue("price"))}
+					</div>
+				);
 			},
 		},
 		{
 			accessorKey: "stock",
 			header: "Stock",
+			cell: ({ row }) => {
+				return <div className="font-mono">{row.getValue("stock")}</div>;
+			},
 		},
 		{
 			accessorKey: "createdAt",

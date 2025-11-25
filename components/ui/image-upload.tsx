@@ -66,7 +66,8 @@ export function ImageUpload({
 								type="button"
 								onClick={() => onRemove(url)}
 								variant="destructive"
-								size="icon">
+								size="icon"
+								className="clip-mecha rounded-none">
 								<X className="h-4 w-4" />
 							</Button>
 						</div>

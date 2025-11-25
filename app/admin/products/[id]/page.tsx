@@ -16,7 +16,12 @@ export default async function EditProductPage({
 	return (
 		<div className="flex-col">
 			<div className="flex-1 space-y-4 p-8 pt-6">
-				<ProductForm initialData={product} />
+				<ProductForm
+					initialData={{
+						...product,
+						brandId: product.brandId ?? undefined,
+					}}
+				/>
 			</div>
 		</div>
 	);

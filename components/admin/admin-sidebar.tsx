@@ -23,43 +23,36 @@ const routes = [
 		label: "Dashboard",
 		icon: LayoutDashboard,
 		href: "/admin",
-		color: "text-sky-500",
 	},
 	{
 		label: "Products",
 		icon: ShoppingBag,
 		href: "/admin/products",
-		color: "text-violet-500",
 	},
 	{
 		label: "Orders",
 		icon: Package,
 		href: "/admin/orders",
-		color: "text-pink-700",
 	},
 	{
 		label: "Users",
 		icon: Users,
 		href: "/admin/users",
-		color: "text-orange-700",
 	},
 	{
 		label: "Brands",
 		icon: Tags,
 		href: "/admin/brands",
-		color: "text-emerald-500",
 	},
 	{
 		label: "Categories",
 		icon: Layers,
 		href: "/admin/categories",
-		color: "text-cyan-500",
 	},
 	{
 		label: "Vouchers",
 		icon: Ticket,
 		href: "/admin/vouchers",
-		color: "text-green-700",
 	},
 	{
 		label: "Settings",
@@ -93,13 +86,23 @@ export function AdminSidebar() {
 							key={route.href}
 							href={route.href}
 							className={cn(
-								"text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 rounded-lg transition",
+								"text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-cyan-400 hover:bg-cyan-900/20 rounded-lg transition relative",
 								pathname === route.href
-									? "text-white bg-white/10"
-									: "text-zinc-400"
+									? "text-cyan-400 bg-cyan-900/20"
+									: "text-slate-400"
 							)}>
+							{pathname === route.href && (
+								<div className="absolute left-0 top-2 bottom-2 w-0.5 bg-cyan-400 rounded-r-full" />
+							)}
 							<div className="flex items-center flex-1">
-								<route.icon className={cn("h-5 w-5 mr-3", route.color)} />
+								<route.icon
+									className={cn(
+										"h-5 w-5 mr-3",
+										pathname === route.href
+											? "text-cyan-400"
+											: "text-slate-400 group-hover:text-cyan-400"
+									)}
+								/>
 								{route.label}
 							</div>
 						</Link>

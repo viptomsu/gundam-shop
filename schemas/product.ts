@@ -8,6 +8,8 @@ export const productSchema = z.object({
 	images: z.array(z.url()),
 	brandId: z.string().optional(),
 	categoryIds: z.array(z.string()).optional(),
+	isFeatured: z.boolean().default(false).optional(),
+	isArchived: z.boolean().default(false).optional(),
 });
 
 export type ProductFormValues = z.infer<typeof productSchema>;
