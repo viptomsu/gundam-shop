@@ -31,6 +31,8 @@ interface TagInputProps {
 	onCreate?: (label: string) => Promise<Option | void>;
 	placeholder?: string;
 	disabled?: boolean;
+	className?: string;
+	"aria-invalid"?: boolean;
 }
 
 export function TagInput({
@@ -40,6 +42,8 @@ export function TagInput({
 	onCreate,
 	placeholder = "Select...",
 	disabled,
+	className,
+	"aria-invalid": ariaInvalid,
 }: TagInputProps) {
 	const [open, setOpen] = React.useState(false);
 	const [inputValue, setInputValue] = React.useState("");
@@ -71,7 +75,10 @@ export function TagInput({
 		<div className="flex flex-col gap-2">
 			<div className="flex flex-wrap gap-1">
 				{selected.map((item) => (
-					<Badge key={item.value} variant="secondary">
+					<Badge
+						key={item.value}
+						variant="outline"
+						className="border-primary text-primary">
 						{item.label}
 						<Button
 							variant="ghost"
@@ -91,9 +98,11 @@ export function TagInput({
 						<div
 							role="combobox"
 							aria-expanded={open}
+							aria-invalid={ariaInvalid}
 							className={cn(
-								"flex h-9 w-full items-center justify-between rounded-none border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer",
-								disabled && "opacity-50 cursor-not-allowed"
+								"flex h-9 w-full items-center justify-between rounded-none bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer tech-input-base",
+								disabled && "opacity-50 cursor-not-allowed",
+								className
 							)}
 							onClick={() => !disabled && setOpen(!open)}>
 							{placeholder}

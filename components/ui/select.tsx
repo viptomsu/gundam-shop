@@ -14,12 +14,15 @@ const SelectValue = SelectPrimitive.Value;
 
 const SelectTrigger = React.forwardRef<
 	React.ElementRef<typeof SelectPrimitive.Trigger>,
-	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+		"aria-invalid"?: boolean;
+	}
+>(({ className, children, "aria-invalid": ariaInvalid, ...props }, ref) => (
 	<SelectPrimitive.Trigger
 		ref={ref}
+		aria-invalid={ariaInvalid}
 		className={cn(
-			"flex h-9 w-full items-center justify-between rounded-none border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+			"flex h-9 w-full items-center justify-between rounded-none bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 tech-input-base",
 			className
 		)}
 		{...props}>

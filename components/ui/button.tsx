@@ -11,16 +11,16 @@ const buttonVariants = cva(
 	{
 		variants: {
 			variant: {
-				default:
-					"backdrop-blur-sm shadow-[0_0_15px_rgba(6,182,212,0.5)] clip-mecha",
+				default: "backdrop-blur-sm clip-mecha btn-shine",
 				outline: "bg-transparent group", // Background handled by pseudo/child
-				ghost: "clip-mecha",
+				ghost: "clip-mecha btn-shine",
 				link: "text-primary underline-offset-4 hover:underline",
 			},
 			color: {
 				primary: "",
 				destructive: "",
 				secondary: "",
+				accent: "",
 			},
 			size: {
 				default: "h-9 px-4 py-2 has-[>svg]:px-3 clip-mecha",
@@ -36,18 +36,26 @@ const buttonVariants = cva(
 			{
 				variant: "default",
 				color: "primary",
-				class: "bg-primary/80 text-primary-foreground hover:bg-primary/90",
+				class:
+					"bg-primary/80 text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(6,182,212,0.5)]",
+			},
+			{
+				variant: "default",
+				color: "accent",
+				class:
+					"bg-accent text-accent-foreground hover:bg-accent/90 shadow-[0_0_15px_rgba(255,215,0,0.5)]",
 			},
 			{
 				variant: "default",
 				color: "destructive",
 				class:
-					"bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+					"bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 shadow-[0_0_15px_rgba(255,0,60,0.5)]",
 			},
 			{
 				variant: "default",
 				color: "secondary",
-				class: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+				class:
+					"bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-[0_0_15px_rgba(30,41,59,0.5)]",
 			},
 			// Outline + Color (Text only, border handled by logic)
 			{
@@ -65,6 +73,11 @@ const buttonVariants = cva(
 				color: "secondary",
 				class: "text-secondary hover:text-secondary-foreground",
 			},
+			{
+				variant: "outline",
+				color: "accent",
+				class: "text-accent hover:text-accent-foreground",
+			},
 			// Ghost + Color
 			{
 				variant: "ghost",
@@ -81,6 +94,11 @@ const buttonVariants = cva(
 				variant: "ghost",
 				color: "secondary",
 				class: "hover:bg-secondary/80 hover:text-secondary-foreground",
+			},
+			{
+				variant: "ghost",
+				color: "accent",
+				class: "hover:bg-accent/10 hover:text-accent",
 			},
 		],
 		defaultVariants: {
@@ -125,6 +143,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 					? "bg-destructive"
 					: color === "secondary"
 					? "bg-secondary"
+					: color === "accent"
+					? "bg-accent"
 					: "bg-input"; // Default/Primary uses input color for border initially
 
 			const hoverBgColor =
@@ -132,6 +152,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 					? "hover:bg-destructive"
 					: color === "secondary"
 					? "hover:bg-secondary"
+					: color === "accent"
+					? "hover:bg-accent"
 					: "hover:bg-primary";
 
 			const groupHoverBgColor =
@@ -139,6 +161,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 					? "group-hover:bg-destructive"
 					: color === "secondary"
 					? "group-hover:bg-secondary"
+					: color === "accent"
+					? "group-hover:bg-accent"
 					: "group-hover:bg-primary";
 
 			const groupHoverTextColor =
@@ -146,6 +170,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 					? "group-hover:text-white"
 					: color === "secondary"
 					? "group-hover:text-secondary-foreground"
+					: color === "accent"
+					? "group-hover:text-accent-foreground"
 					: "group-hover:text-primary-foreground";
 
 			return (
@@ -162,7 +188,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 					{...props}>
 					<span
 						className={cn(
-							"flex h-full w-full items-center justify-center gap-2 bg-background transition-colors duration-300",
+							"flex h-full w-full items-center justify-center gap-2 bg-background transition-colors duration-300 btn-shine z-0",
 							groupHoverBgColor,
 							groupHoverTextColor,
 							clipClass, // Clip the inner content to match

@@ -5,6 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import { Toggle } from "@/components/ui/toggle";
+import { cn } from "@/lib/utils";
 import {
 	Bold,
 	Italic,
@@ -21,9 +22,17 @@ interface EditorProps {
 	value: string;
 	onChange: (value: string) => void;
 	disabled?: boolean;
+	className?: string;
+	"aria-invalid"?: boolean;
 }
 
-export function Editor({ value, onChange, disabled }: EditorProps) {
+export function Editor({
+	value,
+	onChange,
+	disabled,
+	className,
+	"aria-invalid": ariaInvalid,
+}: EditorProps) {
 	const editor = useEditor({
 		extensions: [
 			StarterKit,
@@ -36,7 +45,7 @@ export function Editor({ value, onChange, disabled }: EditorProps) {
 		editorProps: {
 			attributes: {
 				class:
-					"min-h-[150px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rich-text",
+					"min-h-[150px] w-full bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 rich-text",
 			},
 		},
 		onUpdate: ({ editor }) => {
@@ -51,8 +60,13 @@ export function Editor({ value, onChange, disabled }: EditorProps) {
 	}
 
 	return (
-		<div className="flex flex-col gap-2">
-			<div className="flex items-center gap-1 border rounded-md p-1 bg-transparent">
+		<div
+			className={cn(
+				"flex flex-col gap-2 tech-input-base bg-transparent p-2",
+				className
+			)}
+			aria-invalid={ariaInvalid}>
+			<div className="flex items-center gap-1 p-1 bg-transparent">
 				<Toggle
 					size="sm"
 					pressed={editor.isActive("heading", { level: 1 })}

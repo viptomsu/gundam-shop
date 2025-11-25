@@ -15,12 +15,6 @@
 	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
 	--color-sidebar-primary: var(--sidebar-primary);
 	--color-sidebar-foreground: var(--sidebar-foreground);
-	--color-sidebar: var(--sidebar);
-	--color-chart-5: var(--chart-5);
-	--color-chart-4: var(--chart-4);
-	--color-chart-3: var(--chart-3);
-	--color-chart-2: var(--chart-2);
-	--color-chart-1: var(--chart-1);
 	--color-ring: var(--ring);
 	--color-input: var(--input);
 	--color-border: var(--border);
@@ -41,34 +35,59 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
+
+	--animate-slide-down-fade: slide-down-fade 0.3s ease-out forwards;
+
+	@keyframes slide-down-fade {
+		from {
+			opacity: 0;
+			transform: translateY(-4px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
 }
 
 :root {
 	--radius: 0rem; /* Sharp corners by default */
 	--background: #0b0c15; /* Deep Space */
 	--foreground: #e2e8f0; /* Light Gray */
+	/* SURFACES (Vỏ giáp) */
 	--card: #12141c; /* Dark Gunmetal */
 	--card-foreground: #e2e8f0;
 	--popover: #12141c;
 	--popover-foreground: #e2e8f0;
-	--primary: #06b6d4; /* Sharp Cyan */
+
+	/* PRIMARY (Năng lượng chính - GN Particles) */
+	--primary: #06b6d4;
 	--primary-foreground: #000000;
-	--secondary: #1e293b; /* Slate 800 */
+
+	/* SECONDARY (Các chi tiết phụ khí tài) */
+	--secondary: #1e293b;
 	--secondary-foreground: #e2e8f0;
+
+	/* MUTED (Thông số phụ) */
 	--muted: #1e293b;
 	--muted-foreground: #94a3b8;
-	--accent: #ff4655; /* Neon Red */
-	--accent-foreground: #ffffff;
-	--destructive: #ff003c; /* Alert Red */
+
+	/* ACCENT (SỬA ĐỔI: Chuyển sang Vàng Gundam/Industrial Warning) */
+	--accent: #ffd700;
+	--accent-foreground: #000000;
+
+	/* DESTRUCTIVE (SỬA ĐỔI: Đỏ Char Aznable - rực hơn một chút) */
+	--destructive: #ff003c;
 	--destructive-foreground: #ffffff;
-	--border: #2a2b36; /* Tech Border */
+
+	/* BORDERS & INPUTS (Panel Lines) */
+	--border: #2a2b36;
 	--input: #1e293b;
+
+	/* RING (Hiệu ứng phát sáng khi Focus) */
 	--ring: #00e1ff;
-	--chart-1: #00e1ff;
-	--chart-2: #ffd700;
-	--chart-3: #ff003c;
-	--chart-4: #22c55e;
-	--chart-5: #a855f7;
+
+	/* SIDEBAR (Buồng lái) */
 	--sidebar: #0f111a;
 	--sidebar-foreground: #e2e8f0;
 	--sidebar-primary: #06b6d4;
@@ -92,19 +111,13 @@
 	--secondary-foreground: #e2e8f0;
 	--muted: #1e293b;
 	--muted-foreground: #94a3b8;
-	--accent: #ff4655;
+	--accent: #428bbc;
 	--accent-foreground: #ffffff;
 	--destructive: #ff003c;
 	--destructive-foreground: #ffffff;
 	--border: #2a2b36;
 	--input: #1e293b;
 	--ring: #00e1ff;
-	--chart-1: #00e1ff;
-	--chart-2: #ffd700;
-	--chart-3: #ff003c;
-	--chart-4: #22c55e;
-	--chart-5: #a855f7;
-	--sidebar: #0f111a;
 	--sidebar-foreground: #e2e8f0;
 	--sidebar-primary: #06b6d4;
 	--sidebar-primary-foreground: #000000;
@@ -149,6 +162,34 @@
 	button {
 		@apply not-disabled:cursor-pointer;
 	}
+
+	/* Override Chrome/Edge Autofill background */
+	input:-webkit-autofill,
+	input:-webkit-autofill:hover,
+	input:-webkit-autofill:focus,
+	input:-webkit-autofill:active {
+		/* 
+		   Strategy: Use a long transition to prevent the browser from applying 
+		   the default yellow background color. This preserves the transparency 
+		   and the custom background-image (tech lines).
+		   
+		   IMPORTANT: We use !important here because .tech-input-base (in components layer)
+		   has 'transition-all duration-300' which overrides this if we don't force it.
+		*/
+		transition: background-color 5000s ease-in-out 0s !important;
+
+		/* Fix text color visibility */
+		-webkit-text-fill-color: var(--foreground) !important;
+
+		/* Force border to match tech-input-base (border-white/20) */
+		border: 1px solid rgba(255, 255, 255, 0.2) !important;
+
+		/* Ensure caret color matches */
+		caret-color: var(--foreground);
+
+		/* Ensure no shadow covers the background */
+		-webkit-box-shadow: 0 0 0 0 transparent inset !important;
+	}
 }
 
 @layer components {
@@ -182,5 +223,73 @@
 		blockquote {
 			@apply border-l-4 border-muted pl-4 italic my-4;
 		}
+	}
+
+	.tech-input-base {
+		@apply relative transition-all duration-300 border border-white/20 bg-transparent rounded-none;
+		background-image: linear-gradient(var(--accent), var(--accent)),
+			linear-gradient(var(--accent), var(--accent)),
+			linear-gradient(var(--accent), var(--accent)),
+			linear-gradient(var(--accent), var(--accent)),
+			linear-gradient(var(--accent), var(--accent)),
+			linear-gradient(var(--accent), var(--accent)),
+			linear-gradient(var(--accent), var(--accent)),
+			linear-gradient(var(--accent), var(--accent));
+
+		background-size: 0px 2px, 2px 0px, 0px 2px, 2px 0px, 0px 2px, 2px 0px,
+			0px 2px, 2px 0px;
+
+		background-position: center top, left center, center top, right center,
+			center bottom, right center, center bottom, left center;
+
+		background-repeat: no-repeat;
+	}
+
+	.tech-input-base:hover,
+	.tech-input-base:focus,
+	.tech-input-base:focus-within,
+	.tech-input-base[data-state="open"],
+	.tech-input-base[aria-expanded="true"] {
+		@apply outline-none ring-0 shadow-none border-white/20;
+		background-size: 10px 2px, 2px 10px, 10px 2px, 2px 10px, 10px 2px, 2px 10px,
+			10px 2px, 2px 10px;
+
+		background-position: left top, left top, right top, right top, right bottom,
+			right bottom, left bottom, left bottom;
+	}
+
+	.tech-input-base[aria-invalid="true"] {
+		background-image: linear-gradient(var(--destructive), var(--destructive)),
+			linear-gradient(var(--destructive), var(--destructive)),
+			linear-gradient(var(--destructive), var(--destructive)),
+			linear-gradient(var(--destructive), var(--destructive)),
+			linear-gradient(var(--destructive), var(--destructive)),
+			linear-gradient(var(--destructive), var(--destructive)),
+			linear-gradient(var(--destructive), var(--destructive)),
+			linear-gradient(var(--destructive), var(--destructive));
+	}
+
+	.btn-shine {
+		position: relative;
+		overflow: hidden;
+	}
+
+	.btn-shine::after {
+		background: #fff;
+		content: "";
+		height: 155px;
+		left: -75px;
+		opacity: 0.2;
+		position: absolute;
+		top: -50px;
+		transform: rotate(35deg);
+		transition: all 550ms cubic-bezier(0.19, 1, 0.22, 1);
+		width: 50px;
+		z-index: -10;
+	}
+
+	.btn-shine:hover::after {
+		left: 120%;
+		transition: all 550ms cubic-bezier(0.19, 1, 0.22, 1);
 	}
 }
