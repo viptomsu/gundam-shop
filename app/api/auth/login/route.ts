@@ -14,10 +14,10 @@ import { setAuthCookies } from "@/lib/auth-cookies";
 export async function POST(req: Request) {
 	try {
 		const body = await req.json();
-		const { username, password } = loginSchema.parse(body);
+		const { email, password } = loginSchema.parse(body);
 
 		const user = await prisma.user.findUnique({
-			where: { username },
+			where: { email },
 		});
 
 		if (!user) {
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 		}
 
 		const accessToken = sign(
-			{ userId: user.id, username: user.username, role: user.role },
+			{ userId: user.id, email: user.email, role: user.role },
 			ACCESS_TOKEN_SECRET,
 			{ expiresIn: ACCESS_TOKEN_EXPIRES_IN }
 		);
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
 		const response = NextResponse.json(
 			{
 				message: "Login successful",
-				user: { id: user.id, username: user.username, role: user.role },
+				user: { id: user.id, email: user.email, role: user.role },
 			},
 			{ status: 200 }
 		);

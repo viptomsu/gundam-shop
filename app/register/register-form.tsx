@@ -29,7 +29,8 @@ export function RegisterForm() {
 	const form = useForm<RegisterInput>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
-			username: "",
+			name: "",
+			email: "",
 			password: "",
 			confirmPassword: "",
 		},
@@ -50,12 +51,29 @@ export function RegisterForm() {
 					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 						<FormField
 							control={form.control}
-							name="username"
+							name="name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Username</FormLabel>
+									<FormLabel>Name</FormLabel>
 									<FormControl>
-										<Input placeholder="username" {...field} />
+										<Input placeholder="Your name" {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="email"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Email</FormLabel>
+									<FormControl>
+										<Input
+											type="email"
+											placeholder="name@example.com"
+											{...field}
+										/>
 									</FormControl>
 									<FormMessage />
 								</FormItem>

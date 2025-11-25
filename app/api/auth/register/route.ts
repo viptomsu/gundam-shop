@@ -6,15 +6,15 @@ import { registerSchema } from "@/schemas/auth";
 export async function POST(req: Request) {
 	try {
 		const body = await req.json();
-		const { username, password } = registerSchema.parse(body);
+		const { name, email, password } = registerSchema.parse(body);
 
 		const existingUser = await prisma.user.findUnique({
-			where: { username },
+			where: { email },
 		});
 
 		if (existingUser) {
 			return NextResponse.json(
-				{ message: "Username already exists" },
+				{ message: "Email already exists" },
 				{ status: 409 }
 			);
 		}
@@ -23,7 +23,8 @@ export async function POST(req: Request) {
 
 		const user = await prisma.user.create({
 			data: {
-				username,
+				name,
+				email,
 				password: hashedPassword,
 			},
 		});
@@ -31,7 +32,7 @@ export async function POST(req: Request) {
 		return NextResponse.json(
 			{
 				message: "User created successfully",
-				user: { id: user.id, username: user.username },
+				user: { id: user.id, email: user.email },
 			},
 			{ status: 201 }
 		);
