@@ -7,20 +7,54 @@ datasource db {
    url      = env("DATABASE_URL")
 }
 
+// =========================================
+// ENUMS
+// =========================================
+
 enum Role {
    USER
    ADMIN
 }
 
+enum OrderStatus {
+   PENDING // Chờ xác nhận
+   CONFIRMED // Admin đã duyệt
+   SHIPPING // Đang giao
+   DELIVERED // Đã giao
+   CANCELLED // Đã hủy
+}
+
+enum PaymentMethod {
+   COD // Thanh toán khi nhận
+   BANK_TRANSFER // Chuyển khoản
+   VNPAY // Cổng thanh toán
+}
+
+enum PaymentStatus {
+   PENDING
+   PAID
+   FAILED
+}
+
+// =========================================
+// USERS
+// =========================================
+
 model User {
-   id        String   @id @default(cuid())
-   username  String   @unique
-   password  String
-   role      Role     @default(USER)
+   id       String  @id @default(cuid())
+   name     String?
+   email    String  @unique
+   password String
+   role     Role    @default(USER)
+   phone    String?
+   address  String?
+
+   orders        Order[]
+   reviews       Review[]
+   refreshTokens RefreshToken[]
+
    createdAt DateTime @default(now())
    updatedAt DateTime @updatedAt
-
-   refreshTokens RefreshToken[]
 }
 
 model RefreshToken {
@@ -33,40 +67,152 @@ model RefreshToken {
    createdAt DateTime @default(now())
 }
 
-model Product {
-   id          String   @id @default(cuid())
+// =========================================
+// PRODUCTS & CATALOG
+// =========================================
+
+model Brand {
+   id          String    @id @default(cuid())
    name        String
-   description String
-   price       Float
-   stock       Int
-   images      String[]
-   createdAt   DateTime @default(now())
-   updatedAt   DateTime @updatedAt
-
-   brandId String?
-   brand   Brand?  @relation(fields: [brandId], references: [id])
-
-   categories Category[]
+   slug        String    @unique
+   description String?
+   logo        String?
+   products    Product[]
+   createdAt   DateTime  @default(now())
+   updatedAt   DateTime  @updatedAt
 }
 
 model Category {
-   id          String   @id @default(cuid())
+   id          String    @id @default(cuid())
    name        String
+   slug        String    @unique
    description String?
    image       String?
-   createdAt   DateTime @default(now())
-   updatedAt   DateTime @updatedAt
-
-   products Product[]
+   products    Product[]
+   createdAt   DateTime  @default(now())
+   updatedAt   DateTime  @updatedAt
 }
 
-model Brand {
-   id          String   @id @default(cuid())
-   name        String
+model Series {
+   id          String    @id @default(cuid())
+   name        String // VD: Mobile Suit Gundam SEED
+   slug        String    @unique
    description String?
    image       String?
-   createdAt   DateTime @default(now())
-   updatedAt   DateTime @updatedAt
+   products    Product[]
+   createdAt   DateTime  @default(now())
+   updatedAt   DateTime  @updatedAt
+}
 
-   products Product[]
+model Product {
+   id          String   @id @default(cuid())
+   name        String
+   slug        String   @unique
+   description String   @db.Text
+   images      String[] // Ảnh chung của sản phẩm
+
+   // Thuộc tính Gundam (Lưu String cho linh hoạt)
+   grade String? // HG, MG, PG...
+   scale String? // 1/144, 1/100...
+
+   isFeatured Boolean @default(false)
+   isArchived Boolean @default(false) // Ẩn sản phẩm
+
+   // Quan hệ
+   brandId String
+   brand   Brand  @relation(fields: [brandId], references: [id])
+
+   seriesId String?
+   series   Series? @relation(fields: [seriesId], references: [id])
+
+   categories Category[]
+   variants   ProductVariant[]
+   reviews    Review[]
+
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
+
+   @@index([brandId])
+   @@index([seriesId])
+   @@index([slug])
+}
+
+model ProductVariant {
+   id   String  @id @default(cuid())
+   name String // VD: "Ver. Ka", "Clear Color", "Default"
+   sku  String? @unique
+
+   price Decimal @db.Decimal(10, 2)
+   stock Int     @default(0)
+
+   image String? // Ảnh đại diện riêng cho biến thể này
+
+   productId String
+   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+   orderItems OrderItem[]
+
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
+
+   @@index([productId])
+}
+
+model Review {
+   id      String  @id @default(cuid())
+   rating  Int // 1-5
+   comment String?
+
+   userId String
+   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+   productId String
+   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
+}
+
+// =========================================
+// ORDERS
+// =========================================
+
+model Order {
+   id          String @id @default(cuid())
+   orderNumber String @unique // Mã đơn hàng hiển thị (VD: #ORD-001)
+
+   userId String? // Null nếu mua Guest
+   user   User?   @relation(fields: [userId], references: [id])
+
+   // Thông tin giao hàng snapshot
+   guestName       String
+   guestEmail      String
+   guestPhone      String
+   shippingAddress String
+   note            String?
+
+   totalAmount   Decimal       @db.Decimal(10, 2)
+   paymentMethod PaymentMethod @default(COD)
+   paymentStatus PaymentStatus @default(PENDING)
+   status        OrderStatus   @default(PENDING)
+
+   orderItems OrderItem[]
+
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+   id      String @id @default(cuid())
+   orderId String
+   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+   variantId String
+   variant   ProductVariant @relation(fields: [variantId], references: [id])
+
+   quantity Int
+   price    Decimal @db.Decimal(10, 2) // Giá tại thời điểm mua
+
+   @@index([orderId])
+   @@index([variantId])
 }
