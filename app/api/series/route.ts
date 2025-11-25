@@ -4,7 +4,7 @@ import { getAuthCookies } from "@/lib/auth-cookies";
 import { verify } from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET } from "@/config/auth";
 import { paginationSchema } from "@/schemas/common";
-import { categorySchema } from "@/schemas/category";
+import { seriesSchema } from "@/schemas/series";
 import { z } from "zod";
 
 export async function GET(req: Request) {
@@ -28,20 +28,20 @@ export async function GET(req: Request) {
 			  }
 			: {};
 
-		const [categories, total] = await Promise.all([
-			prisma.category.findMany({
+		const [series, total] = await Promise.all([
+			prisma.series.findMany({
 				where,
 				skip,
 				take: limit,
 				orderBy: { createdAt: "desc" },
 			}),
-			prisma.category.count({ where }),
+			prisma.series.count({ where }),
 		]);
 
 		const totalPages = Math.ceil(total / limit);
 
 		return NextResponse.json({
-			data: categories,
+			data: series,
 			meta: {
 				page,
 				limit,
@@ -79,9 +79,9 @@ export async function POST(req: Request) {
 		}
 
 		const body = await req.json();
-		const { name, slug, description, image } = categorySchema.parse(body);
+		const { name, slug, description, image } = seriesSchema.parse(body);
 
-		const category = await prisma.category.create({
+		const series = await prisma.series.create({
 			data: {
 				name,
 				slug,
@@ -90,8 +90,14 @@ export async function POST(req: Request) {
 			},
 		});
 
-		return NextResponse.json(category, { status: 201 });
+		return NextResponse.json(series, { status: 201 });
 	} catch (error: any) {
+		if (error instanceof z.ZodError) {
+			return NextResponse.json(
+				{ error: (error as any).errors },
+				{ status: 400 }
+			);
+		}
 		return NextResponse.json(
 			{ message: error.message || "Something went wrong" },
 			{ status: 500 }

@@ -1,13 +1,13 @@
 "use client";
 
-import { CategoryFormValues } from "@/schemas/category";
+import { SeriesFormValues } from "@/schemas/series";
 import { GenericAdminForm } from "@/components/admin/generic-admin-form";
 
-interface CategoryFormProps {
-	initialData?: CategoryFormValues & { id: string };
+interface SeriesFormProps {
+	initialData?: SeriesFormValues & { id: string };
 }
 
-export function CategoryForm({ initialData }: CategoryFormProps) {
+export function SeriesForm({ initialData }: SeriesFormProps) {
 	const initialValues = initialData
 		? {
 				name: initialData.name,
@@ -25,12 +25,12 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
 	return (
 		<GenericAdminForm
 			initialValues={initialValues}
-			apiEndpoint="/categories"
-			redirectUrl="/admin/categories"
-			title={initialData ? "Edit Category" : "Create Category"}
-			queryKey="categories"
+			apiEndpoint="/series"
+			redirectUrl="/admin/series"
+			title={initialData ? "Edit Series" : "Create Series"}
+			queryKey="series-list"
 			id={initialData?.id}
-			folder="gundam/categories"
+			folder="gundam/series"
 		/>
 	);
 }

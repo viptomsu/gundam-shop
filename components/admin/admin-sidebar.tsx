@@ -50,6 +50,11 @@ const routes = [
 		href: "/admin/categories",
 	},
 	{
+		label: "Series",
+		icon: Layers,
+		href: "/admin/series",
+	},
+	{
 		label: "Vouchers",
 		icon: Ticket,
 		href: "/admin/vouchers",

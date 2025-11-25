@@ -4,6 +4,7 @@ import { getAuthCookies } from "@/lib/auth-cookies";
 import { verify } from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET } from "@/config/auth";
 import { paginationSchema } from "@/schemas/common";
+import { brandSchema } from "@/schemas/brand";
 import { z } from "zod";
 
 export async function GET(req: Request) {
@@ -78,20 +79,14 @@ export async function POST(req: Request) {
 		}
 
 		const body = await req.json();
-		const { name, description, image } = body;
-
-		if (!name) {
-			return NextResponse.json(
-				{ message: "Name is required" },
-				{ status: 400 }
-			);
-		}
+		const { name, slug, description, logo } = brandSchema.parse(body);
 
 		const brand = await prisma.brand.create({
 			data: {
 				name,
+				slug,
 				description,
-				image,
+				logo,
 			},
 		});
 
