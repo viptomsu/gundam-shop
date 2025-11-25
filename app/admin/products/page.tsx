@@ -114,10 +114,7 @@ export default function ProductsPage() {
 				return (
 					<div className="flex flex-wrap gap-1">
 						{categories?.map((c) => (
-							<Badge
-								key={c.id}
-								variant="outline"
-								className="text-xs border-primary/50 text-primary bg-primary/5 rounded-none clip-mecha-sm">
+							<Badge key={c.id} variant="outline">
 								{c.name}
 							</Badge>
 						))}
@@ -166,6 +163,7 @@ export default function ProductsPage() {
 						</Button>
 						<Button
 							variant="ghost"
+							color="destructive"
 							size="icon"
 							onClick={() => handleDelete(row.original.id)}>
 							<Trash className="h-4 w-4" />

@@ -57,8 +57,8 @@
 	--secondary-foreground: #e2e8f0;
 	--muted: #1e293b;
 	--muted-foreground: #94a3b8;
-	--accent: #ffd700; /* Warning Yellow */
-	--accent-foreground: #000000;
+	--accent: #ff4655; /* Neon Red */
+	--accent-foreground: #ffffff;
 	--destructive: #ff003c; /* Alert Red */
 	--destructive-foreground: #ffffff;
 	--border: #2a2b36; /* Tech Border */
@@ -92,8 +92,8 @@
 	--secondary-foreground: #e2e8f0;
 	--muted: #1e293b;
 	--muted-foreground: #94a3b8;
-	--accent: #ffd700;
-	--accent-foreground: #000000;
+	--accent: #ff4655;
+	--accent-foreground: #ffffff;
 	--destructive: #ff003c;
 	--destructive-foreground: #ffffff;
 	--border: #2a2b36;
@@ -122,6 +122,17 @@
 		100% 100%,
 		10px 100%,
 		0 calc(100% - 10px)
+	);
+}
+
+@utility clip-mecha-sm {
+	clip-path: polygon(
+		0 0,
+		calc(100% - 4px) 0,
+		100% 4px,
+		100% 100%,
+		4px 100%,
+		0 calc(100% - 4px)
 	);
 }
 

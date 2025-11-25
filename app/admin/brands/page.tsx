@@ -103,6 +103,7 @@ export default function BrandsPage() {
 						</Button>
 						<Button
 							variant="ghost"
+							color="destructive"
 							size="icon"
 							onClick={() => handleDelete(row.original.id)}>
 							<Trash className="h-4 w-4" />

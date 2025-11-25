@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { X } from "lucide-react";
+import { RiCloseLine } from "react-icons/ri";
+import { ChevronDown, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -74,10 +75,11 @@ export function TagInput({
 						{item.label}
 						<Button
 							variant="ghost"
+							color="destructive"
 							size="icon"
-							className="ml-1 h-3 w-3 rounded-full p-0 hover:bg-transparent"
+							className="h-3 w-3 p-0"
 							onClick={() => handleUnselect(item)}>
-							<X className="h-3 w-3" />
+							<RiCloseLine className="h-3 w-3" />
 							<span className="sr-only">Remove {item.label}</span>
 						</Button>
 					</Badge>
@@ -85,14 +87,19 @@ export function TagInput({
 			</div>
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
-					<Button
-						variant="outline"
-						role="combobox"
-						aria-expanded={open}
-						className="w-full justify-between"
-						disabled={disabled}>
-						{placeholder}
-					</Button>
+					<PopoverTrigger asChild>
+						<div
+							role="combobox"
+							aria-expanded={open}
+							className={cn(
+								"flex h-9 w-full items-center justify-between rounded-none border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer",
+								disabled && "opacity-50 cursor-not-allowed"
+							)}
+							onClick={() => !disabled && setOpen(!open)}>
+							{placeholder}
+							<ChevronDown className="h-4 w-4 opacity-50" />
+						</div>
+					</PopoverTrigger>
 				</PopoverTrigger>
 				<PopoverContent className="w-full p-0" align="start">
 					<Command>
@@ -113,14 +120,15 @@ export function TagInput({
 												onChange([...value, option.value]);
 											}
 											setOpen(false);
-										}}>
+										}}
+										className="data-[selected=true]:bg-primary/10 data-[selected=true]:text-primary cursor-pointer">
 										<div
 											className={cn(
-												"mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-												value.includes(option.value)
-													? "bg-primary text-primary-foreground"
-													: "opacity-50 [&_svg]:invisible"
-											)}></div>
+												"mr-2 flex h-4 w-4 items-center justify-center opacity-0 transition-opacity",
+												value.includes(option.value) && "opacity-100"
+											)}>
+											<Check className="h-4 w-4 text-primary" />
+										</div>
 										{option.label}
 									</CommandItem>
 								))}

@@ -29,17 +29,36 @@ function Badge({
 	className,
 	variant,
 	asChild = false,
+	children,
 	...props
 }: React.ComponentProps<"span"> &
 	VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
 	const Comp = asChild ? Slot : "span";
 
+	if (variant === "outline") {
+		return (
+			<Comp
+				data-slot="badge"
+				className={cn(
+					badgeVariants({ variant }),
+					"p-px clip-mecha-sm bg-primary/50 hover:bg-primary transition-colors duration-300 border-0",
+					className
+				)}
+				{...props}>
+				<span className="flex h-full w-full items-center justify-center gap-1 bg-background px-2 py-0.5 clip-mecha-sm">
+					{children}
+				</span>
+			</Comp>
+		);
+	}
+
 	return (
 		<Comp
 			data-slot="badge"
 			className={cn(badgeVariants({ variant }), className)}
-			{...props}
-		/>
+			{...props}>
+			{children}
+		</Comp>
 	);
 }
 

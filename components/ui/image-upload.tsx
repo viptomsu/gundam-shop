@@ -65,7 +65,8 @@ export function ImageUpload({
 							<Button
 								type="button"
 								onClick={() => onRemove(url)}
-								variant="destructive"
+								variant="outline"
+								color="destructive"
 								size="icon"
 								className="clip-mecha rounded-none">
 								<X className="h-4 w-4" />
@@ -79,7 +80,8 @@ export function ImageUpload({
 				<Button
 					type="button"
 					disabled={disabled || isUploading}
-					variant="secondary"
+					variant="default"
+					color="secondary"
 					onClick={() => document.getElementById("image-upload")?.click()}>
 					<ImagePlus className="h-4 w-4 mr-2" />
 					Upload an Image
