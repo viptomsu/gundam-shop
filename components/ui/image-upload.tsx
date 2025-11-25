@@ -23,6 +23,8 @@ export function ImageUpload({
 }: ImageUploadProps) {
 	const [isUploading, setIsUploading] = useState(false);
 
+	const uniqueId = `image-upload-${Math.random().toString(36).substr(2, 9)}`;
+
 	const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		try {
 			const file = e.target.files?.[0];
@@ -82,12 +84,12 @@ export function ImageUpload({
 					disabled={disabled || isUploading}
 					variant="default"
 					color="secondary"
-					onClick={() => document.getElementById("image-upload")?.click()}>
+					onClick={() => document.getElementById(uniqueId)?.click()}>
 					<ImagePlus className="h-4 w-4 mr-2" />
 					Upload an Image
 				</Button>
 				<input
-					id="image-upload"
+					id={uniqueId}
 					type="file"
 					accept="image/*"
 					className="hidden"

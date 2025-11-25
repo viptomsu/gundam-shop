@@ -78,15 +78,30 @@ export async function POST(request: Request) {
 		const body = await request.json();
 		const validatedData = productSchema.parse(body);
 
-		const { categoryIds, ...rest } = validatedData;
+		const { categoryIds, variants, ...rest } = validatedData;
 
-		const product = await prisma.product.create({
-			data: {
-				...rest,
-				categories: {
-					connect: categoryIds?.map((id) => ({ id })),
+		const product = await prisma.$transaction(async (tx) => {
+			// 1. Create Product
+			const newProduct = await tx.product.create({
+				data: {
+					...rest,
+					categories: {
+						connect: categoryIds?.map((id) => ({ id })),
+					},
 				},
-			},
+			});
+
+			// 2. Create Variants
+			if (variants && variants.length > 0) {
+				await tx.productVariant.createMany({
+					data: variants.map((variant) => ({
+						...variant,
+						productId: newProduct.id,
+					})),
+				});
+			}
+
+			return newProduct;
 		});
 
 		return NextResponse.json(product, { status: 201 });

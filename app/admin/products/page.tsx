@@ -17,6 +17,11 @@ import { Product, Brand, Category } from "@prisma/client";
 import { SearchInput } from "@/components/ui/search-input";
 import { FilterSelect } from "@/components/ui/filter-select";
 import { Badge } from "@/components/ui/badge";
+import { GUNDAM_GRADES, GUNDAM_SCALES } from "@/config/constants";
+
+import { useBrands } from "@/hooks/queries/use-brands";
+import { useCategories } from "@/hooks/queries/use-categories";
+import { useSeries } from "@/hooks/queries/use-series";
 
 type ProductWithCategories = Product & { categories: Category[] };
 
@@ -26,7 +31,10 @@ export default function ProductsPage() {
 		limit: 10,
 		search: "",
 		brandId: "",
+		seriesId: "",
 		categoryId: "",
+		grade: "",
+		scale: "",
 	});
 	const confirm = useConfirm();
 	const queryClient = useQueryClient();
@@ -41,21 +49,9 @@ export default function ProductsPage() {
 		},
 	});
 
-	const { data: brands } = useQuery({
-		queryKey: ["brands-list"],
-		queryFn: async () => {
-			const res = await api.get("/brands?limit=100");
-			return res.data.data as Brand[];
-		},
-	});
-
-	const { data: categories } = useQuery({
-		queryKey: ["categories-list"],
-		queryFn: async () => {
-			const res = await api.get("/categories?limit=100");
-			return res.data.data as Category[];
-		},
-	});
+	const { data: brands } = useBrands();
+	const { data: categories } = useCategories();
+	const { data: series } = useSeries();
 
 	const deleteMutation = useMutation({
 		mutationFn: async (id: string) => {
@@ -185,7 +181,7 @@ export default function ProductsPage() {
 				</Button>
 			</div>
 
-			<div className="flex items-center gap-4">
+			<div className="flex items-center gap-4 flex-wrap">
 				<SearchInput placeholder="Search products..." />
 				<FilterSelect
 					paramName="brandId"
@@ -193,11 +189,26 @@ export default function ProductsPage() {
 					options={brands?.map((b) => ({ label: b.name, value: b.id })) || []}
 				/>
 				<FilterSelect
+					paramName="seriesId"
+					placeholder="Filter by Series"
+					options={series?.map((s) => ({ label: s.name, value: s.id })) || []}
+				/>
+				<FilterSelect
 					paramName="categoryId"
 					placeholder="Filter by Category"
 					options={
 						categories?.map((c) => ({ label: c.name, value: c.id })) || []
 					}
+				/>
+				<FilterSelect
+					paramName="grade"
+					placeholder="Filter by Grade"
+					options={GUNDAM_GRADES}
+				/>
+				<FilterSelect
+					paramName="scale"
+					placeholder="Filter by Scale"
+					options={GUNDAM_SCALES}
 				/>
 			</div>
 
