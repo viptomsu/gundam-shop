@@ -19,7 +19,18 @@ export default async function EditProductPage({
 				<ProductForm
 					initialData={{
 						...product,
-						brandId: product.brandId ?? undefined,
+						brandId: product.brandId ?? "",
+						seriesId: product.seriesId ?? undefined,
+						grade: product.grade ?? undefined,
+						scale: product.scale ?? undefined,
+						categoryIds: product.categories.map((c) => c.id),
+						variants: product.variants.map((v) => ({
+							...v,
+							sku: v.sku ?? "",
+							price: Number(v.price),
+							image: v.image ?? undefined,
+							isArchived: v.isArchived,
+						})),
 					}}
 				/>
 			</div>

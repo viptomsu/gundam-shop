@@ -11,7 +11,7 @@ export async function GET(
 		const { id } = await params;
 		const product = await prisma.product.findUnique({
 			where: { id },
-			include: { categories: true, brand: true },
+			include: { categories: true, brand: true, variants: true },
 		});
 
 		if (!product) {
@@ -37,7 +37,7 @@ export async function PUT(
 		const body = await request.json();
 		const validatedData = productSchema.parse(body);
 
-		const { categoryIds, ...rest } = validatedData;
+		const { categoryIds, variants, ...rest } = validatedData;
 
 		const product = await prisma.product.update({
 			where: { id },
@@ -45,6 +45,18 @@ export async function PUT(
 				...rest,
 				categories: {
 					set: categoryIds?.map((id) => ({ id })),
+				},
+				variants: {
+					deleteMany: {
+						sku: {
+							notIn: variants.map((v) => v.sku),
+						},
+					},
+					upsert: variants.map((v) => ({
+						where: { sku: v.sku },
+						update: { ...v },
+						create: { ...v },
+					})),
 				},
 			},
 		});

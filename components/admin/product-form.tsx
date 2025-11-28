@@ -32,13 +32,7 @@ import { useEffect } from "react";
 import { useBrands } from "@/hooks/queries/use-brands";
 import { useSeries } from "@/hooks/queries/use-series";
 import { useCategories } from "@/hooks/queries/use-categories";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+import { DataSelect } from "@/components/ui/data-select";
 
 interface ProductFormProps {
 	initialData?: ProductFormValues & { id: string };
@@ -225,24 +219,19 @@ export function ProductForm({ initialData }: ProductFormProps) {
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Brand</FormLabel>
-										<Select
+										<DataSelect
 											disabled={mutation.isPending}
 											onValueChange={field.onChange}
 											value={field.value}
-											defaultValue={field.value}>
-											<FormControl>
-												<SelectTrigger>
-													<SelectValue placeholder="Select a brand" />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{brands?.map((brand) => (
-													<SelectItem key={brand.id} value={brand.id}>
-														{brand.name}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
+											options={
+												brands?.map((brand) => ({
+													label: brand.name,
+													value: brand.id,
+												})) || []
+											}
+											placeholder="Select a brand"
+											isLoading={!brands}
+										/>
 										<FormMessage />
 									</FormItem>
 								)}
@@ -253,24 +242,19 @@ export function ProductForm({ initialData }: ProductFormProps) {
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Series</FormLabel>
-										<Select
+										<DataSelect
 											disabled={mutation.isPending}
 											onValueChange={field.onChange}
 											value={field.value || ""}
-											defaultValue={field.value || ""}>
-											<FormControl>
-												<SelectTrigger>
-													<SelectValue placeholder="Select a series" />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{series?.map((s) => (
-													<SelectItem key={s.id} value={s.id}>
-														{s.name}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
+											options={
+												series?.map((s) => ({
+													label: s.name,
+													value: s.id,
+												})) || []
+											}
+											placeholder="Select a series"
+											isLoading={!series}
+										/>
 										<FormMessage />
 									</FormItem>
 								)}

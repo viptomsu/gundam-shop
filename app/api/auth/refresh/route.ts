@@ -72,7 +72,7 @@ export async function POST(req: Request) {
 		const newAccessToken = sign(
 			{
 				userId: savedToken.user.id,
-				username: savedToken.user.username,
+				username: savedToken.user.email,
 				role: savedToken.user.role,
 			},
 			ACCESS_TOKEN_SECRET,

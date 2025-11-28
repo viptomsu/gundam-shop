@@ -45,14 +45,14 @@ export async function PUT(
 
 		const { id } = await params;
 		const body = await req.json();
-		const { name, description, image } = body;
+		const { name, description, logo } = body;
 
 		const brand = await prisma.brand.update({
 			where: { id },
 			data: {
 				name,
 				description,
-				image,
+				logo,
 			},
 		});
 

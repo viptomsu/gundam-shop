@@ -1,9 +1,24 @@
 import { fetchApi } from "@/lib/api";
-import { Product } from "@prisma/client";
+import { Product, ProductVariant, Category, Brand } from "@prisma/client";
 
-export const getProduct = async (id: string): Promise<Product | null> => {
+export const getProduct = async (
+	id: string
+): Promise<
+	| (Product & {
+			variants: ProductVariant[];
+			categories: Category[];
+			brand: Brand;
+	  })
+	| null
+> => {
 	try {
-		return await fetchApi<Product>(`/api/products/${id}`, {
+		return await fetchApi<
+			Product & {
+				variants: ProductVariant[];
+				categories: Category[];
+				brand: Brand;
+			}
+		>(`/api/products/${id}`, {
 			cache: "no-store",
 		});
 	} catch (error) {

@@ -21,7 +21,16 @@ export async function GET(req: Request) {
 
 		const user = await prisma.user.findUnique({
 			where: { id: decoded.userId },
-			select: { id: true, username: true, role: true },
+			select: {
+				id: true,
+				name: true,
+				role: true,
+				email: true,
+				address: true,
+				phone: true,
+				createdAt: true,
+				updatedAt: true,
+			},
 		});
 
 		if (!user) {

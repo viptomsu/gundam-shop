@@ -16,7 +16,6 @@ import { formatCurrency, formatDate } from "@/utils/format";
 import { Product, Brand, Category, ProductVariant } from "@prisma/client";
 import { SearchInput } from "@/components/ui/search-input";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { FilterSelect } from "@/components/ui/filter-select";
 import { Badge } from "@/components/ui/badge";
 import { Toggle } from "@/components/ui/toggle";
 import {
@@ -305,7 +304,7 @@ export default function ProductsPage() {
 								<Toggle
 									variant="outline"
 									aria-label="Toggle featured"
-									pressed={params.isFeatured === true}
+									pressed={!!params.isFeatured}
 									onPressedChange={(pressed) => {
 										setParams((prev) => {
 											const newParams = { ...prev };
@@ -319,7 +318,7 @@ export default function ProductsPage() {
 									}}>
 									<Star
 										className={`h-4 w-4 ${
-											params.isFeatured === true ? "fill-current" : ""
+											params.isFeatured ? "fill-current" : ""
 										}`}
 									/>
 								</Toggle>
@@ -336,7 +335,7 @@ export default function ProductsPage() {
 								<Toggle
 									variant="outline"
 									aria-label="Toggle archived"
-									pressed={params.isArchived === true}
+									pressed={!!params.isArchived}
 									onPressedChange={(pressed) => {
 										setParams((prev) => {
 											const newParams = { ...prev };
