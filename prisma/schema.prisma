@@ -18,26 +18,26 @@ enum Role {
 
 enum OrderStatus {
    PENDING // Chờ xác nhận
-   CONFIRMED // Admin đã duyệt
-   SHIPPING // Đang giao
-   DELIVERED // Đã giao
+   CONFIRMED // Đã xác nhận (Admin duyệt)
+   SHIPPING // Đang giao hàng
+   DELIVERED // Giao thành công
    CANCELLED // Đã hủy
 }
 
 enum PaymentMethod {
-   COD // Thanh toán khi nhận
-   BANK_TRANSFER // Chuyển khoản
-   VNPAY // Cổng thanh toán
+   COD // Thanh toán khi nhận hàng
+   BANK_TRANSFER // Chuyển khoản ngân hàng
+   VNPAY // Cổng thanh toán (Để dành cho tương lai)
 }
 
 enum PaymentStatus {
-   PENDING
-   PAID
-   FAILED
+   PENDING // Chưa thanh toán
+   PAID // Đã thanh toán
+   FAILED // Thanh toán lỗi
 }
 
 // =========================================
-// USERS
+// USER & AUTH
 // =========================================
 
 model User {
@@ -46,6 +46,7 @@ model User {
    email    String  @unique
    password String
    role     Role    @default(USER)
+   avatar   String?
    phone    String?
    address  String?
 
@@ -68,58 +69,69 @@ model RefreshToken {
 }
 
 // =========================================
-// PRODUCTS & CATALOG
+// CATALOG (Brand, Category, Series)
 // =========================================
 
 model Brand {
-   id          String    @id @default(cuid())
+   id          String  @id @default(cuid())
    name        String
-   slug        String    @unique
+   slug        String  @unique
    description String?
    logo        String?
-   products    Product[]
-   createdAt   DateTime  @default(now())
-   updatedAt   DateTime  @updatedAt
+
+   products Product[]
+
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
 }
 
 model Category {
-   id          String    @id @default(cuid())
+   id          String  @id @default(cuid())
    name        String
-   slug        String    @unique
+   slug        String  @unique
    description String?
    image       String?
-   products    Product[]
-   createdAt   DateTime  @default(now())
-   updatedAt   DateTime  @updatedAt
+
+   products Product[]
+
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
 }
 
 model Series {
-   id          String    @id @default(cuid())
+   id          String  @id @default(cuid())
    name        String // VD: Mobile Suit Gundam SEED
-   slug        String    @unique
+   slug        String  @unique
    description String?
    image       String?
-   products    Product[]
-   createdAt   DateTime  @default(now())
-   updatedAt   DateTime  @updatedAt
+
+   products Product[]
+
+   createdAt DateTime @default(now())
+   updatedAt DateTime @updatedAt
 }
+
+// =========================================
+// PRODUCT CORE
+// =========================================
 
 model Product {
    id          String   @id @default(cuid())
    name        String
    slug        String   @unique
    description String   @db.Text
-   images      String[] // Ảnh chung của sản phẩm
+   images      String[] // Ảnh gallery chung
 
-   // Thuộc tính Gundam (Lưu String cho linh hoạt)
+   // Thuộc tính Gundam (Lưu String, quản lý list ở Frontend)
    grade String? // HG, MG, PG...
    scale String? // 1/144, 1/100...
 
-   rating     Float @default(0)
-   numReviews Int   @default(0)
-
+   // Trạng thái & Chỉ số
    isFeatured Boolean @default(false)
-   isArchived Boolean @default(false) // Ẩn sản phẩm
+   isArchived Boolean @default(false) // Ẩn toàn bộ sản phẩm
+
+   rating     Float @default(0) // Cache điểm đánh giá (0-5)
+   numReviews Int   @default(0) // Cache số lượng đánh giá
 
    // Quan hệ
    brandId String
@@ -138,6 +150,7 @@ model Product {
    @@index([brandId])
    @@index([seriesId])
    @@index([slug])
+   @@index([rating])
 }
 
 model ProductVariant {
@@ -145,12 +158,17 @@ model ProductVariant {
    name String // VD: "Ver. Ka", "Clear Color", "Default"
    sku  String? @unique
 
-   price Decimal @db.Decimal(10, 2)
+   // GIÁ & KHUYẾN MÃI (MVP logic)
+   price Decimal @db.Decimal(10, 2) // Giá niêm yết
+
+   salePrice     Decimal?  @db.Decimal(10, 2) // Giá sale (nếu có)
+   saleStartDate DateTime? // Ngày bắt đầu giảm
+   saleEndDate   DateTime? // Ngày kết thúc giảm
+
    stock Int     @default(0)
+   image String? // Ảnh riêng cho biến thể này
 
-   image String? // Ảnh đại diện riêng cho biến thể này
-
-   isArchived Boolean @default(false)
+   isArchived Boolean @default(false) // Xóa mềm (Ngừng kinh doanh biến thể này)
 
    productId String
    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -179,24 +197,33 @@ model Review {
 }
 
 // =========================================
-// ORDERS
+// ORDER & CHECKOUT
 // =========================================
 
 model Order {
    id          String @id @default(cuid())
-   orderNumber String @unique // Mã đơn hàng hiển thị (VD: #ORD-001)
+   orderNumber String @unique // Mã đơn hiển thị (VD: #ORD-001)
 
    userId String? // Null nếu mua Guest
    user   User?   @relation(fields: [userId], references: [id])
 
-   // Thông tin giao hàng snapshot
+   // Snapshot thông tin giao hàng
    guestName       String
    guestEmail      String
    guestPhone      String
    shippingAddress String
    note            String?
 
-   totalAmount   Decimal       @db.Decimal(10, 2)
+   // Price
+   subtotal       Decimal @db.Decimal(10, 2) // Tổng tiền hàng
+   shippingFee    Decimal @default(0) @db.Decimal(10, 2) // Phí ship
+   discountAmount Decimal @default(0) @db.Decimal(10, 2) // Giảm giá voucher (để dành cho Phase 2)
+   totalAmount    Decimal @db.Decimal(10, 2) // Tổng thực trả
+
+   //Shipping
+   trackingNumber String? // Mã vận đơn (VD: GHTK827364) - Null khi mới đặt
+   carrier        String? // Tên đơn vị (VD: Giao Hàng Tiết Kiệm) - Null khi mới đặt
+
    paymentMethod PaymentMethod @default(COD)
    paymentStatus PaymentStatus @default(PENDING)
    status        OrderStatus   @default(PENDING)
@@ -205,6 +232,8 @@ model Order {
 
    createdAt DateTime @default(now())
    updatedAt DateTime @updatedAt
+
+   @@index([userId])
 }
 
 model OrderItem {
@@ -215,9 +244,14 @@ model OrderItem {
    variantId String
    variant   ProductVariant @relation(fields: [variantId], references: [id])
 
-   quantity Int
-   price    Decimal @db.Decimal(10, 2) // Giá tại thời điểm mua
+   quantity      Int
+   price         Decimal @db.Decimal(10, 2) // Lưu giá TẠI THỜI ĐIỂM MUA (Giá sau khi đã sale)
+   originalPrice Decimal @db.Decimal(10, 2) // Giá gốc niêm yết tại thời điểm mua
 
    @@index([orderId])
    @@index([variantId])
 }
+
+// =========================================
+// FUTURE: PROMOTIONS & COUPONS (Placeholder)
+// =========================================
