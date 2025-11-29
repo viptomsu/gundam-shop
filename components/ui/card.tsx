@@ -4,18 +4,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const cardVariants = cva(
-	"bg-card text-card-foreground flex flex-col gap-6 border border-primary/20 py-6 shadow-sm relative overflow-hidden transition-all duration-300",
+	"rounded-none relative overflow-hidden transition-all duration-300",
 	{
 		variants: {
 			variant: {
-				default:
-					"has-data-[state=checked]:border-primary has-data-[state=checked]:shadow-[0_0_15px_rgba(6,182,212,0.3)]",
-				accent:
-					"has-data-[state=checked]:border-accent has-data-[state=checked]:shadow-[0_0_15px_rgba(255,215,0,0.3)]",
+				sensor:
+					"bg-card/40 text-card-foreground [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)]",
+				armor:
+					"bg-card text-card-foreground border border-border [&_[data-slot=card-header]]:border-b [&_[data-slot=card-header]]:border-border",
+				slot: "bg-card text-card-foreground border-l-4 border-l-muted hover:border-l-primary data-[active=true]:border-l-primary",
 			},
 		},
 		defaultVariants: {
-			variant: "default",
+			variant: "armor",
 		},
 	}
 );
@@ -30,7 +31,16 @@ function Card({
 			data-slot="card"
 			className={cn(cardVariants({ variant }), className)}
 			{...props}>
-			<div className="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-primary/50 rounded-tr-none clip-mecha pointer-events-none opacity-50" />
+			{/* Sensor Variant Decoration */}
+			{variant === "sensor" && (
+				<div className="absolute top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary to-transparent pointer-events-none" />
+			)}
+
+			{/* Armor Variant Decoration */}
+			{variant === "armor" && (
+				<div className="absolute top-0 right-0 w-1.5 h-1.5 bg-primary pointer-events-none" />
+			)}
+
 			{props.children}
 		</div>
 	);
@@ -41,7 +51,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
 		<div
 			data-slot="card-header"
 			className={cn(
-				"@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
+				"@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 p-4 has-data-[slot=card-action]:grid-cols-[1fr_auto]",
 				className
 			)}
 			{...props}
@@ -84,11 +94,7 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
 
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
 	return (
-		<div
-			data-slot="card-content"
-			className={cn("px-6", className)}
-			{...props}
-		/>
+		<div data-slot="card-content" className={cn("p-4", className)} {...props} />
 	);
 }
 
@@ -96,7 +102,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
 	return (
 		<div
 			data-slot="card-footer"
-			className={cn("flex items-center px-6 [.border-t]:pt-6", className)}
+			className={cn("flex items-center p-4 pt-0", className)}
 			{...props}
 		/>
 	);

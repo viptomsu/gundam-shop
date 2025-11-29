@@ -348,7 +348,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 							control={form.control}
 							name="isArchived"
 							render={({ field }) => (
-								<Card className="p-4" variant="accent">
+								<Card className="p-4">
 									<FormItem className="flex flex-row items-start space-x-3 space-y-0">
 										<FormControl>
 											<Checkbox
@@ -368,7 +368,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 							)}
 						/>
 						{initialData && (
-							<div className="rounded-md border p-4">
+							<Card className="p-4" variant="sensor">
 								<div className="space-y-1">
 									<h4 className="text-sm font-medium leading-none">Rating</h4>
 									<p className="text-sm text-muted-foreground">
@@ -376,7 +376,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 										{(initialData as any).numReviews || 0} reviews)
 									</p>
 								</div>
-							</div>
+							</Card>
 						)}
 					</div>
 
@@ -405,8 +405,8 @@ export function ProductForm({ initialData }: ProductFormProps) {
 						</div>
 						<div className="space-y-4">
 							{fields.map((field, index) => (
-								<Card key={field.id} variant="accent">
-									<CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 pb-2">
+								<Card key={field.id}>
+									<CardHeader className="flex flex-row items-center justify-between space-y-0">
 										<CardTitle className="text-sm font-medium">
 											<FormField
 												control={form.control}

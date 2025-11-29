@@ -21,7 +21,6 @@ import { Toggle } from "@/components/ui/toggle";
 import {
 	Tooltip,
 	TooltipContent,
-	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Star, Archive } from "lucide-react";
@@ -179,25 +178,44 @@ export default function ProductsPage() {
 			},
 		},
 		{
-			accessorKey: "isFeatured",
-			header: "Featured",
-			cell: ({ row }) => {
-				return (
-					<Badge variant={row.original.isFeatured ? "default" : "secondary"}>
-						{row.original.isFeatured ? "Yes" : "No"}
-					</Badge>
-				);
+			id: "status",
+			header: "Status",
+			meta: {
+				className: "w-[80px]",
 			},
-		},
-		{
-			accessorKey: "isArchived",
-			header: "Archived",
 			cell: ({ row }) => {
 				return (
-					<Badge
-						variant={row.original.isArchived ? "destructive" : "secondary"}>
-						{row.original.isArchived ? "Yes" : "No"}
-					</Badge>
+					<div className="flex items-center gap-2">
+						<Tooltip>
+							<TooltipTrigger>
+								<Star
+									className={`h-4 w-4 ${
+										row.original.isFeatured
+											? "fill-yellow-400 text-yellow-400"
+											: "text-muted-foreground"
+									}`}
+								/>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>{row.original.isFeatured ? "Featured" : "Not Featured"}</p>
+							</TooltipContent>
+						</Tooltip>
+
+						<Tooltip>
+							<TooltipTrigger>
+								<Archive
+									className={`h-4 w-4 ${
+										row.original.isArchived
+											? "text-destructive"
+											: "text-muted-foreground"
+									}`}
+								/>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>{row.original.isArchived ? "Archived" : "Active"}</p>
+							</TooltipContent>
+						</Tooltip>
+					</div>
 				);
 			},
 		},
@@ -298,63 +316,59 @@ export default function ProductsPage() {
 					}
 				/>
 				<div className="flex items-center gap-2">
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<Toggle
-									variant="outline"
-									aria-label="Toggle featured"
-									pressed={!!params.isFeatured}
-									onPressedChange={(pressed) => {
-										setParams((prev) => {
-											const newParams = { ...prev };
-											if (pressed) {
-												newParams.isFeatured = true;
-											} else {
-												newParams.isFeatured = undefined;
-											}
-											return { ...newParams, page: 1 };
-										});
-									}}>
-									<Star
-										className={`h-4 w-4 ${
-											params.isFeatured ? "fill-current" : ""
-										}`}
-									/>
-								</Toggle>
-							</TooltipTrigger>
-							<TooltipContent>
-								<p>Filter by Featured</p>
-							</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Toggle
+								variant="outline"
+								aria-label="Toggle featured"
+								pressed={!!params.isFeatured}
+								onPressedChange={(pressed) => {
+									setParams((prev) => {
+										const newParams = { ...prev };
+										if (pressed) {
+											newParams.isFeatured = true;
+										} else {
+											newParams.isFeatured = undefined;
+										}
+										return { ...newParams, page: 1 };
+									});
+								}}>
+								<Star
+									className={`h-4 w-4 ${
+										params.isFeatured ? "fill-current" : ""
+									}`}
+								/>
+							</Toggle>
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Filter by Featured</p>
+						</TooltipContent>
+					</Tooltip>
 
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<Toggle
-									variant="outline"
-									aria-label="Toggle archived"
-									pressed={!!params.isArchived}
-									onPressedChange={(pressed) => {
-										setParams((prev) => {
-											const newParams = { ...prev };
-											if (pressed) {
-												newParams.isArchived = true;
-											} else {
-												newParams.isArchived = undefined;
-											}
-											return { ...newParams, page: 1 };
-										});
-									}}>
-									<Archive className="h-4 w-4" />
-								</Toggle>
-							</TooltipTrigger>
-							<TooltipContent>
-								<p>Filter by Archived</p>
-							</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Toggle
+								variant="outline"
+								aria-label="Toggle archived"
+								pressed={!!params.isArchived}
+								onPressedChange={(pressed) => {
+									setParams((prev) => {
+										const newParams = { ...prev };
+										if (pressed) {
+											newParams.isArchived = true;
+										} else {
+											newParams.isArchived = undefined;
+										}
+										return { ...newParams, page: 1 };
+									});
+								}}>
+								<Archive className="h-4 w-4" />
+							</Toggle>
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Filter by Archived</p>
+						</TooltipContent>
+					</Tooltip>
 				</div>
 			</div>
 
