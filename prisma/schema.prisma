@@ -49,6 +49,7 @@ model User {
    avatar   String?
    phone    String?
    address  String?
+   isBanned Boolean @default(false)
 
    orders        Order[]
    reviews       Review[]

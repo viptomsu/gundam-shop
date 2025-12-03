@@ -128,7 +128,7 @@ export function GenericAdminPage<T extends { id: string }>({
 			id: "actions",
 			header: "Actions",
 			meta: {
-				className: "w-25",
+				className: "w-23",
 			},
 			cell: ({ row }) => {
 				return (
