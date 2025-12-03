@@ -106,3 +106,16 @@ export const useModalStore = create<ModalStore>((set, get) => ({
 		});
 	},
 }));
+
+export const useModal = (id: ModalIds | string) => {
+	const { show, hide } = useModalStore();
+	const isOpen = useModalStore((state) => state.modals[id]?.isOpen || false);
+	const args = useModalStore((state) => state.modals[id]?.args);
+
+	return {
+		isOpen,
+		args,
+		show: (args?: any) => show(id, args),
+		hide: () => hide(id),
+	};
+};

@@ -12,7 +12,12 @@ import { toast } from "sonner";
 import api from "@/lib/axios";
 import { useUrlParams } from "@/hooks/use-url-params";
 import { useConfirm } from "@/hooks/use-confirm";
-import { formatCurrency, formatDate } from "@/utils/format";
+import {
+	formatCurrency,
+	formatDate,
+	formatCompactNumber,
+	formatShortDate,
+} from "@/utils/format";
 import { Product, Brand, Category, ProductVariant } from "@prisma/client";
 import { SearchInput } from "@/components/ui/search-input";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -159,7 +164,7 @@ export default function ProductsPage() {
 							{variantCount} variant{variantCount !== 1 && "s"}
 						</span>
 						<span className="text-muted-foreground text-xs">
-							Stock: {totalStock}
+							Stock: {formatCompactNumber(totalStock)}
 						</span>
 						<span className="text-muted-foreground text-xs">
 							{minPrice > 0
@@ -173,15 +178,18 @@ export default function ProductsPage() {
 		{
 			accessorKey: "createdAt",
 			header: "Date",
+			meta: {
+				className: "w-24",
+			},
 			cell: ({ row }) => {
-				return formatDate(row.getValue("createdAt"));
+				return formatShortDate(row.getValue("createdAt"));
 			},
 		},
 		{
 			id: "status",
 			header: "Status",
 			meta: {
-				className: "w-[80px]",
+				className: "w-18",
 			},
 			cell: ({ row }) => {
 				return (
@@ -227,7 +235,7 @@ export default function ProductsPage() {
 					<div className="flex flex-col text-sm">
 						<span>{row.original.rating.toFixed(1)} / 5</span>
 						<span className="text-xs text-muted-foreground">
-							({row.original.numReviews} reviews)
+							({formatCompactNumber(row.original.numReviews)} reviews)
 						</span>
 					</div>
 				);
@@ -237,7 +245,7 @@ export default function ProductsPage() {
 			id: "actions",
 			header: "Actions",
 			meta: {
-				className: "w-25",
+				className: "w-23 text-center",
 			},
 			cell: ({ row }) => {
 				return (

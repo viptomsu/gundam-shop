@@ -12,3 +12,18 @@ export function formatDate(date: string | Date): string {
 		day: "numeric",
 	});
 }
+
+export function formatCompactNumber(number: number): string {
+	return new Intl.NumberFormat("en-US", {
+		notation: "compact",
+		maximumFractionDigits: 1,
+	}).format(number);
+}
+
+export function formatShortDate(date: string | Date): string {
+	return new Date(date).toLocaleDateString("en-US", {
+		month: "short",
+		day: "numeric",
+		year: "2-digit",
+	});
+}
