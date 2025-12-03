@@ -5,6 +5,7 @@ import api from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { use } from "react";
+import { NotFound } from "@/components/ui/not-found";
 
 export default function EditSeriesPage({
 	params,
@@ -26,6 +27,17 @@ export default function EditSeriesPage({
 			<div className="flex h-full items-center justify-center">
 				<Loader2 className="h-6 w-6 animate-spin" />
 			</div>
+		);
+	}
+
+	if (!series) {
+		return (
+			<NotFound
+				title="Series not found"
+				description="The series you are looking for does not exist or has been deleted."
+				linkText="Back to Series"
+				linkHref="/admin/series"
+			/>
 		);
 	}
 

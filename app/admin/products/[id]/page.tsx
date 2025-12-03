@@ -1,5 +1,6 @@
 import { ProductForm } from "@/components/admin/product-form";
 import { getProduct } from "@/services/products";
+import { NotFound } from "@/components/ui/not-found";
 
 export default async function EditProductPage({
 	params,
@@ -10,7 +11,14 @@ export default async function EditProductPage({
 	const product = await getProduct(id);
 
 	if (!product) {
-		return <div>Product not found</div>;
+		return (
+			<NotFound
+				title="Product not found"
+				description="The product you are looking for does not exist or has been deleted."
+				linkText="Back to Products"
+				linkHref="/admin/products"
+			/>
+		);
 	}
 
 	return (
@@ -28,6 +36,9 @@ export default async function EditProductPage({
 							...v,
 							sku: v.sku ?? "",
 							price: Number(v.price),
+							salePrice: v.salePrice ? Number(v.salePrice) : undefined,
+							saleStartDate: v.saleStartDate ?? undefined,
+							saleEndDate: v.saleEndDate ?? undefined,
 							image: v.image ?? undefined,
 							isArchived: v.isArchived,
 						})),

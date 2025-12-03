@@ -13,6 +13,7 @@ import { ArrowLeft, Mail, Phone, MapPin, Calendar, Shield } from "lucide-react";
 import Link from "next/link";
 import { formatShortDate } from "@/utils/format";
 import { Role } from "@prisma/client";
+import { NotFound } from "@/components/ui/not-found";
 
 export default function UserDetailPage() {
 	const params = useParams();
@@ -52,7 +53,14 @@ export default function UserDetailPage() {
 	}
 
 	if (!user) {
-		return <div>User not found</div>;
+		return (
+			<NotFound
+				title="User not found"
+				description="The user you are looking for does not exist or has been deleted."
+				linkText="Back to Users"
+				linkHref="/admin/users"
+			/>
+		);
 	}
 
 	return (
