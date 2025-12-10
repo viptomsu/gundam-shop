@@ -1,13 +1,6 @@
 "use client";
 
-import {
-	useRef,
-	Suspense,
-	useState,
-	useEffect,
-	Component,
-	ReactNode,
-} from "react";
+import { useRef, Suspense, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
 	OrbitControls,
@@ -20,15 +13,14 @@ import * as THREE from "three";
 
 const gundamModel = "/3d/rx-0_full_armor_unicorn.glb";
 
-function BarbatosModel(props: any) {
-	const { scene, nodes } = useGLTF(gundamModel);
-	console.log(nodes);
+function GundamModel(props: any) {
+	const { scene } = useGLTF(gundamModel);
 	const meshRef = useRef<THREE.Group>(null);
 
 	useFrame((state, delta) => {
 		if (meshRef.current) {
 			// Slow rotation for showcase effect
-			meshRef.current.rotation.y += delta * 0.1;
+			meshRef.current.rotation.y += delta * 0.15;
 		}
 	});
 
@@ -44,11 +36,26 @@ function BarbatosModel(props: any) {
 // Preload the model
 useGLTF.preload(gundamModel);
 
+// HUD-style loading cube
 function Loader() {
+	const meshRef = useRef<THREE.Mesh>(null);
+
+	useFrame((state, delta) => {
+		if (meshRef.current) {
+			meshRef.current.rotation.x += delta * 2;
+			meshRef.current.rotation.y += delta * 2;
+		}
+	});
+
 	return (
-		<mesh>
-			<boxGeometry args={[1, 1, 1]} />
-			<meshStandardMaterial color="#00ff67" wireframe />
+		<mesh ref={meshRef}>
+			<boxGeometry args={[0.5, 0.5, 0.5]} />
+			<meshStandardMaterial
+				color="#06b6d4"
+				wireframe
+				emissive="#06b6d4"
+				emissiveIntensity={0.5}
+			/>
 		</mesh>
 	);
 }
@@ -62,21 +69,28 @@ export function Hero3DViewer() {
 
 	if (!isMounted) {
 		return (
-			<div className="h-full w-full min-h-[400px] flex items-center justify-center bg-transparent">
-				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+			<div className="h-full w-full min-h-[400px] flex flex-col items-center justify-center bg-transparent gap-4">
+				{/* HUD-style loading indicator */}
+				<div className="relative w-16 h-16">
+					<div className="absolute inset-0 border-2 border-primary/30 animate-pulse" />
+					<div
+						className="absolute inset-2 border border-primary/50 animate-spin"
+						style={{ animationDuration: "3s" }}
+					/>
+					<div className="absolute inset-4 bg-primary/20" />
+				</div>
+				<span className="font-mono text-xs text-primary/60">
+					LOADING_ASSET...
+				</span>
 			</div>
 		);
 	}
 
 	return (
 		<div className="h-full w-full min-h-[400px] bg-transparent relative">
-			{/* <ErrorBoundary> */}
 			<Canvas
-				// frameloop="demand"
 				gl={{ alpha: true, antialias: true }}
-				className="bg-transparent h-full w-full"
-				// dpr={[1, 2]}
-			>
+				className="bg-transparent h-full w-full">
 				<PerspectiveCamera makeDefault position={[0, 0, 4]} />
 				<OrbitControls
 					enableZoom={true}
@@ -86,26 +100,29 @@ export function Hero3DViewer() {
 					autoRotate={false}
 				/>
 
-				{/* Lighting setup for metallic look */}
-				<ambientLight intensity={1} />
+				{/* Enhanced lighting for metallic/mecha look */}
+				<ambientLight intensity={0.8} />
 				<spotLight
 					position={[10, 10, 10]}
 					angle={0.15}
 					penumbra={1}
 					intensity={2}
+					color="#ffffff"
 				/>
-				<pointLight position={[-10, -10, -10]} intensity={1} color="#00ff67" />
+				{/* Cyan rim light for mecha effect */}
+				<pointLight position={[-10, 5, -10]} intensity={1.5} color="#06b6d4" />
+				{/* Warm accent light from below */}
+				<pointLight position={[5, -10, 5]} intensity={0.5} color="#ffd700" />
 				<Environment preset="city" />
 
 				<Suspense fallback={<Loader />}>
-					<BarbatosModel
+					<GundamModel
 						scale={0.8}
 						position={[0, 0, 0]}
 						rotation={[0, Math.PI, 0]}
 					/>
 				</Suspense>
 			</Canvas>
-			{/* </ErrorBoundary> */}
 		</div>
 	);
 }

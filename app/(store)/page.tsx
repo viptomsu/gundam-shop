@@ -1,17 +1,21 @@
-import { Hero } from "@/components/store/hero";
 import { CategoryNav } from "@/components/store/category-nav";
+import { GradeList } from "@/components/store/grade-list";
+import { Hero } from "@/components/store/hero";
 import { NewArrivals } from "@/components/store/new-arrivals";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default function StorePage() {
 	return (
-		<div className="flex flex-col gap-8 pb-20">
+		<main className="min-h-screen bg-background">
 			<Hero />
 			<CategoryNav />
+			<GradeList />
 			<NewArrivals />
 
-			{/* Featured Banner (Static for now) */}
+			{/* Featured Banner */}
 			<section className="container px-4 md:px-6 py-12">
 				<div className="relative overflow-hidden rounded-lg border border-border bg-card">
 					<div className="absolute inset-0 bg-linear-to-r from-background via-background/90 to-transparent z-10" />
@@ -30,12 +34,12 @@ export default function StorePage() {
 							Limited edition kits available only for a short time. Secure your
 							pre-order before they are gone forever.
 						</p>
-						{/* Reusing UI Button */}
-						{/* Note: In a real implementation, we would import Button from @components/ui/button */}
-						{/* But since this is inside the page, we can just use HTML or the Button component if imported */}
+						<Button size="lg" className="gap-2 group">
+							<Link href="/products?tag=p-bandai">PRE-ORDER NOW</Link>
+						</Button>
 					</div>
 				</div>
 			</section>
-		</div>
+		</main>
 	);
 }

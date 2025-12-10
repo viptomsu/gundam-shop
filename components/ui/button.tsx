@@ -188,13 +188,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 					{...props}>
 					<span
 						className={cn(
-							"flex h-full w-full items-center justify-center gap-2 bg-background transition-colors duration-300 btn-shine z-0",
+							"flex items-center justify-center gap-2 bg-background transition-colors duration-300 btn-shine z-0",
 							groupHoverBgColor,
 							groupHoverTextColor,
 							clipClass, // Clip the inner content to match
-							size === "default" && "px-4 py-2", // Re-apply padding internally
-							size === "sm" && "px-3",
-							size === "lg" && "px-6"
+							size === "default" && "h-[calc(theme(spacing.9)-2px)] px-4 py-2", // Re-apply padding internally
+							size === "sm" && "h-[calc(theme(spacing.8)-2px)] px-3",
+							size === "lg" && "h-[calc(theme(spacing.10)-2px)] px-6"
 						)}>
 						{children}
 					</span>
