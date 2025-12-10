@@ -8,7 +8,7 @@ export const userSchema = z.object({
 		.string()
 		.min(6, "Password must be at least 6 characters")
 		.optional(),
-	role: z.nativeEnum(Role).default(Role.USER),
+	role: z.nativeEnum(Role),
 	phone: z.string().optional().nullable(),
 	address: z.string().optional().nullable(),
 	avatar: z.string().optional().nullable(),

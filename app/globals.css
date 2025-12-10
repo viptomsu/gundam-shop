@@ -293,3 +293,9 @@
 		transition: all 550ms cubic-bezier(0.19, 1, 0.22, 1);
 	}
 }
+
+@layer utilities {
+	.container {
+		@apply mx-auto max-w-7xl;
+	}
+}
