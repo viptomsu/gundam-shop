@@ -25,6 +25,7 @@ import {
 	formatPrice,
 } from "@/lib/product-utils";
 import { cn } from "@/lib/utils";
+import { useCartStore } from "@/store/cart";
 
 import type { Product, ProductVariant, Brand, Series } from "@prisma/client";
 
@@ -43,6 +44,7 @@ export function ProductView({ product }: ProductViewProps) {
 		product.variants[0]
 	);
 	const [activeImageIndex, setActiveImageIndex] = useState(0);
+	const addItem = useCartStore((state) => state.addItem);
 
 	// Combine variant image with product images for gallery
 	const galleryImages = useMemo(() => {
@@ -76,8 +78,23 @@ export function ProductView({ product }: ProductViewProps) {
 	const discountPercent = getDiscountPercent(selectedVariant);
 
 	const handleAddToCart = () => {
-		toast.info("Add to Cart clicked", {
-			description: `${product.name} - ${selectedVariant.name}`,
+		const displayPrice = getDisplayPrice(selectedVariant);
+		const itemName = `${product.name} - ${selectedVariant.name}`;
+
+		addItem({
+			variantId: selectedVariant.id,
+			productId: product.id,
+			name: itemName,
+			slug: product.slug,
+			image:
+				selectedVariant.image || product.images[0] || "/placeholder-gundam.jpg",
+			price: displayPrice,
+			quantity: 1,
+			maxStock: selectedVariant.stock,
+		});
+
+		toast.success("Unit acquired", {
+			description: itemName,
 		});
 	};
 

@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/store/navbar";
 import { Footer } from "@/components/store/footer";
+import { CartSheet } from "@/components/cart/cart-sheet";
 
 export default function StoreLayout({
 	children,
@@ -11,6 +12,7 @@ export default function StoreLayout({
 			<Navbar />
 			<main className="flex-1">{children}</main>
 			<Footer />
+			<CartSheet />
 		</div>
 	);
 }

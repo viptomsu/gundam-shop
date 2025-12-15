@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Search, ShoppingCart, User, Menu } from "lucide-react";
+import { useCartStore, selectTotalItems } from "@/store/cart";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,6 +18,9 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 
 export function Navbar() {
+	const totalItems = useCartStore(selectTotalItems);
+	const setCartOpen = useCartStore((state) => state.setOpen);
+
 	return (
 		<header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md supports-backdrop-filter:bg-background/60">
 			<div className="container flex h-16 items-center justify-between px-4 md:px-6">
@@ -53,11 +57,17 @@ export function Navbar() {
 					</Button>
 
 					{/* Cart */}
-					<Button variant="ghost" size="icon" className="relative">
+					<Button
+						variant="ghost"
+						size="icon"
+						className="relative"
+						onClick={() => setCartOpen(true)}>
 						<ShoppingCart className="h-5 w-5" />
-						<Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center bg-primary text-primary-foreground text-[10px]">
-							2
-						</Badge>
+						{totalItems > 0 && (
+							<Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center bg-primary text-primary-foreground text-[10px]">
+								{totalItems > 99 ? "99+" : totalItems}
+							</Badge>
+						)}
 						<span className="sr-only">Cart</span>
 					</Button>
 

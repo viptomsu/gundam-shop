@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { FileQuestion } from "lucide-react";
+import { FileQuestion, type LucideIcon } from "lucide-react";
 
 interface NotFoundProps {
 	title?: string;
 	description?: string;
 	linkText?: string;
 	linkHref?: string;
-	icon?: React.ElementType;
+	icon?: LucideIcon;
 }
 
 export function NotFound({
