@@ -1,15 +1,11 @@
 import Link from "next/link";
 import { GUNDAM_GRADES } from "@/config/constants";
+import { SectionHeader } from "./section-header";
 
 export function GradeList() {
 	return (
 		<section className="container px-4 md:px-6 py-12 border-t border-border/40">
-			<div className="flex items-center justify-between mb-8">
-				<h2 className="text-2xl font-bold tracking-tighter font-display uppercase flex items-center gap-2">
-					<span className="w-2 h-8 bg-primary block clip-mecha-sm" />
-					Filter By Grade
-				</h2>
-			</div>
+			<SectionHeader title="Filter By Grade" />
 
 			<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
 				{GUNDAM_GRADES.map((grade) => (

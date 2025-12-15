@@ -16,11 +16,41 @@ const badgeVariants = cva(
 				destructive:
 					"border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
 				outline:
-					"text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground border-primary/50",
+					"text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+			},
+			color: {
+				default: "",
+				success: "",
+				destructive: "",
+				warning: "",
 			},
 		},
+		compoundVariants: [
+			// Outline + color combinations
+			{
+				variant: "outline",
+				color: "default",
+				className: "border-primary/50 text-primary",
+			},
+			{
+				variant: "outline",
+				color: "success",
+				className: "border-emerald-500/50 text-emerald-400",
+			},
+			{
+				variant: "outline",
+				color: "destructive",
+				className: "border-destructive/50 text-destructive",
+			},
+			{
+				variant: "outline",
+				color: "warning",
+				className: "border-amber-500/50 text-amber-400",
+			},
+		],
 		defaultVariants: {
 			variant: "default",
+			color: "default",
 		},
 	}
 );
@@ -28,6 +58,7 @@ const badgeVariants = cva(
 function Badge({
 	className,
 	variant,
+	color,
 	asChild = false,
 	children,
 	...props
@@ -36,12 +67,21 @@ function Badge({
 	const Comp = asChild ? Slot : "span";
 
 	if (variant === "outline") {
+		// Get color-specific border class for the glow effect
+		const glowColorMap = {
+			default: "bg-primary/50 hover:bg-primary",
+			success: "bg-emerald-500/50 hover:bg-emerald-500",
+			destructive: "bg-destructive/50 hover:bg-destructive",
+			warning: "bg-amber-500/50 hover:bg-amber-500",
+		};
+		const glowClass = glowColorMap[color || "default"];
+
 		return (
 			<Comp
 				data-slot="badge"
 				className={cn(
-					badgeVariants({ variant }),
-					"p-px clip-mecha-sm bg-primary/50 hover:bg-primary transition-colors duration-300 border-0",
+					badgeVariants({ variant, color }),
+					`p-px clip-mecha-sm ${glowClass} transition-colors duration-300 border-0`,
 					className
 				)}
 				{...props}>
@@ -55,7 +95,7 @@ function Badge({
 	return (
 		<Comp
 			data-slot="badge"
-			className={cn(badgeVariants({ variant }), className)}
+			className={cn(badgeVariants({ variant, color }), className)}
 			{...props}>
 			{children}
 		</Comp>

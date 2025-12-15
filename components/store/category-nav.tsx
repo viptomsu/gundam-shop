@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { fetchApi } from "@/lib/api";
 import { Category } from "@prisma/client";
+import { SectionHeader } from "./section-header";
 
 type CategoryWithCount = Category & {
 	_count: {
@@ -34,18 +35,7 @@ export async function CategoryNav() {
 
 	return (
 		<section className="container px-4 md:px-6 py-12">
-			<div className="flex items-center justify-between mb-8">
-				<h2 className="text-2xl font-bold tracking-tighter font-display uppercase">
-					<span className="text-primary mr-2">///</span>
-					Browse Categories
-				</h2>
-				<Link
-					href="/categories"
-					className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 group">
-					<span className="font-mono">VIEW_ALL</span>
-					<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-				</Link>
-			</div>
+			<SectionHeader title="Browse Categories" viewAllHref="/categories" />
 
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 				{categories.map((cat) => (
