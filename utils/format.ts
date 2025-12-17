@@ -27,3 +27,13 @@ export function formatShortDate(date: string | Date): string {
 		year: "2-digit",
 	});
 }
+
+export function formatDateTime(date: string | Date): string {
+	return new Date(date).toLocaleString("en-GB", {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+	});
+}
