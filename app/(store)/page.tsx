@@ -1,7 +1,9 @@
+import { BrandNav } from "@/components/store/brand-nav";
 import { CategoryNav } from "@/components/store/category-nav";
 import { GradeList } from "@/components/store/grade-list";
 import { Hero } from "@/components/store/hero";
 import { NewArrivals } from "@/components/store/new-arrivals";
+import { SeriesNav } from "@/components/store/series-nav";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -12,6 +14,8 @@ export default function StorePage() {
 		<main className="min-h-screen bg-background">
 			<Hero />
 			<CategoryNav />
+			<SeriesNav />
+			<BrandNav />
 			<GradeList />
 			<NewArrivals />
 
