@@ -119,12 +119,12 @@ export function AdminSidebar() {
 					<div className="flex items-center gap-x-3 p-3 rounded-lg bg-white/5 border border-white/10">
 						<Avatar className="h-10 w-10">
 							<AvatarFallback className="bg-sky-500 text-white font-bold">
-								{user.username?.[0]?.toUpperCase() || "U"}
+								{(user.name ?? user.email)?.[0]?.toUpperCase() || "U"}
 							</AvatarFallback>
 						</Avatar>
 						<div className="flex flex-col flex-1 min-w-0">
 							<p className="text-sm font-medium text-white truncate">
-								{user.username}
+								{user.name ?? user.email}
 							</p>
 							<p className="text-xs text-zinc-400 truncate">{user.role}</p>
 						</div>

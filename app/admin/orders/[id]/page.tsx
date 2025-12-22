@@ -39,6 +39,11 @@ import { LoadingScreen } from "@/components/ui/loading-screen";
 
 import api from "@/lib/axios";
 import { formatCurrency, formatDateTime } from "@/utils/format";
+import {
+	adminOrderStatusConfig,
+	paymentStatusConfig,
+	paymentMethodLabels,
+} from "@/lib/order-config";
 import { updateOrderStatus, updatePaymentStatus } from "@/app/actions/order";
 import {
 	Order,
@@ -59,33 +64,6 @@ type OrderWithRelations = Order & {
 			product: Pick<Product, "id" | "name" | "slug" | "images">;
 		};
 	})[];
-};
-
-// Status badge color mapping
-const orderStatusConfig: Record<
-	OrderStatus,
-	{ label: string; color: "warning" | "default" | "success" | "destructive" }
-> = {
-	PENDING: { label: "Pending", color: "warning" },
-	CONFIRMED: { label: "Confirmed", color: "default" },
-	SHIPPING: { label: "Shipping", color: "default" },
-	DELIVERED: { label: "Delivered", color: "success" },
-	CANCELLED: { label: "Cancelled", color: "destructive" },
-};
-
-const paymentStatusConfig: Record<
-	PaymentStatus,
-	{ label: string; color: "success" | "default" | "destructive" }
-> = {
-	PENDING: { label: "Pending", color: "default" },
-	PAID: { label: "Paid", color: "success" },
-	FAILED: { label: "Failed", color: "destructive" },
-};
-
-const paymentMethodLabels: Record<PaymentMethod, string> = {
-	COD: "Cash on Delivery",
-	BANK_TRANSFER: "Bank Transfer",
-	VNPAY: "VNPay",
 };
 
 export default function OrderDetailPage() {
@@ -206,7 +184,7 @@ export default function OrderDetailPage() {
 		);
 	}
 
-	const statusConfig = orderStatusConfig[order.status];
+	const statusConfig = adminOrderStatusConfig[order.status];
 	const paymentConfig = paymentStatusConfig[order.paymentStatus];
 
 	return (

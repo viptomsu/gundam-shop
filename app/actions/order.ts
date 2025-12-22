@@ -7,6 +7,9 @@ import {
 } from "@/schemas/checkout";
 import type { CartItem } from "@/store/cart";
 import { PaymentMethod, OrderStatus, PaymentStatus } from "@prisma/client";
+import { verify } from "jsonwebtoken";
+import { cookies } from "next/headers";
+import { ACCESS_TOKEN_SECRET } from "@/config/auth";
 
 // Shipping fee constant (30,000 VND in cents/base unit)
 const SHIPPING_FEE = 30000;
@@ -323,6 +326,78 @@ export async function updatePaymentStatus(
 				error instanceof Error
 					? error.message
 					: "Failed to update payment status",
+		};
+	}
+}
+
+/**
+ * Server Action: Cancel My Order (User self-service)
+ * Only allows cancellation of user's own PENDING orders
+ * Restocks inventory atomically
+ */
+export async function cancelMyOrder(orderId: string): Promise<ActionResult> {
+	try {
+		// Get user from access token cookie
+		const cookieStore = await cookies();
+		const accessToken = cookieStore.get("accessToken")?.value;
+
+		if (!accessToken) {
+			return { success: false, message: "Unauthorized" };
+		}
+
+		let decoded: { userId: string };
+		try {
+			decoded = verify(accessToken, ACCESS_TOKEN_SECRET) as { userId: string };
+		} catch {
+			return { success: false, message: "Invalid token" };
+		}
+
+		// Use transaction for atomicity
+		await prisma.$transaction(async (tx) => {
+			// Get order and verify ownership
+			const order = await tx.order.findUnique({
+				where: { id: orderId },
+				include: { orderItems: true },
+			});
+
+			if (!order) {
+				throw new Error("Order not found");
+			}
+
+			// Verify ownership
+			if (order.userId !== decoded.userId) {
+				throw new Error("You don't have permission to cancel this order");
+			}
+
+			// Check status - only PENDING orders can be cancelled
+			if (order.status !== OrderStatus.PENDING) {
+				throw new Error("Only pending orders can be cancelled");
+			}
+
+			// Update order status
+			await tx.order.update({
+				where: { id: orderId },
+				data: { status: OrderStatus.CANCELLED },
+			});
+
+			// Restock inventory
+			for (const item of order.orderItems) {
+				await tx.productVariant.update({
+					where: { id: item.variantId },
+					data: {
+						stock: { increment: item.quantity },
+					},
+				});
+			}
+		});
+
+		return { success: true };
+	} catch (error) {
+		console.error("[CANCEL_MY_ORDER_ERROR]", error);
+		return {
+			success: false,
+			message:
+				error instanceof Error ? error.message : "Failed to cancel order",
 		};
 	}
 }
