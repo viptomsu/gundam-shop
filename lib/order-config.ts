@@ -39,6 +39,17 @@ export const orderStatusConfig: Record<
 };
 
 /**
+ * Order status timeline (excludes CANCELLED)
+ * Used for progress visualization
+ */
+export const orderStatusTimeline: OrderStatus[] = [
+	"PENDING",
+	"CONFIRMED",
+	"SHIPPING",
+	"DELIVERED",
+];
+
+/**
  * Order status config for admin (with Badge color props)
  */
 export const adminOrderStatusConfig: Record<
