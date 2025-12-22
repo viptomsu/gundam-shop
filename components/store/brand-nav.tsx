@@ -1,89 +1,91 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { fetchApi } from "@/lib/api";
-import { Category } from "@prisma/client";
+import { Brand } from "@prisma/client";
 import { SectionHeader } from "./section-header";
 
-type CategoryWithCount = Category & {
+type BrandWithCount = Brand & {
 	_count: {
 		products: number;
 	};
 };
 
 type ApiResponse = {
-	data: CategoryWithCount[];
+	data: BrandWithCount[];
 	meta: {
 		total: number;
 	};
 };
 
-export async function CategoryNav() {
-	let categories: CategoryWithCount[] = [];
+export async function BrandNav() {
+	let brands: BrandWithCount[] = [];
 
 	try {
-		const response = await fetchApi<ApiResponse>("/api/categories?limit=8", {
+		const response = await fetchApi<ApiResponse>("/api/brands?limit=8", {
 			next: { revalidate: 60 },
 		});
-		categories = response.data;
+		brands = response.data;
 	} catch (error) {
-		console.error("Failed to fetch categories:", error);
+		console.error("Failed to fetch brands:", error);
 	}
 
-	if (categories.length === 0) {
+	if (brands.length === 0) {
 		return null;
 	}
 
 	return (
 		<section className="container px-4 md:px-6 py-12">
-			<SectionHeader title="Browse Categories" viewAllHref="/categories" />
+			<SectionHeader title="Shop by Brand" viewAllHref="/brands" />
 
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-				{categories.map((cat) => (
-					<Link key={cat.id} href={`/categories/${cat.slug}`}>
+				{brands.map((brand) => (
+					<Link key={brand.id} href={`/brands/${brand.slug}`}>
 						<div className="group relative h-48 overflow-hidden clip-mecha transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
 							{/* Border wrapper */}
-							<div className="absolute inset-0 bg-linear-to-br from-primary/30 via-primary/10 to-primary/30 p-px clip-mecha">
+							<div className="absolute inset-0 bg-linear-to-br from-accent/30 via-accent/10 to-accent/30 p-px clip-mecha">
 								<div className="absolute inset-px bg-card clip-mecha" />
 							</div>
 
-							{/* Background Image */}
-							{cat.image && (
-								<div
-									className="absolute inset-0 bg-cover bg-center opacity-30 transition-all duration-500 group-hover:opacity-50 group-hover:scale-110"
-									style={{ backgroundImage: `url(${cat.image})` }}
-								/>
+							{/* Logo/Background Image */}
+							{brand.logo && (
+								<div className="absolute inset-0 flex items-center justify-center opacity-20 transition-all duration-500 group-hover:opacity-40">
+									<div
+										className="w-24 h-24 bg-contain bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-110"
+										style={{ backgroundImage: `url(${brand.logo})` }}
+									/>
+								</div>
 							)}
 
 							{/* Gradient Overlay */}
 							<div className="absolute inset-0 bg-linear-to-t from-background via-background/80 to-transparent z-10" />
 
 							{/* Grid Pattern */}
-							<div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(6,182,212,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.1)_1px,transparent_1px)] bg-size-[20px_20px] z-10" />
+							<div className="absolute inset-0 opacity-10 bg-[linear-gradient(rgba(255,215,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,215,0,0.1)_1px,transparent_1px)] bg-size-[20px_20px] z-10" />
 
 							{/* Content */}
 							<div className="relative z-20 h-full p-5 flex flex-col justify-end">
 								{/* Product Count Badge */}
-								<div className="absolute top-4 right-4 font-mono text-[10px] text-primary/70 bg-primary/10 px-2 py-1 clip-mecha-sm">
-									{cat._count.products} ITEMS
+								<div className="absolute top-4 right-4 font-mono text-[10px] text-accent/70 bg-accent/10 px-2 py-1 clip-mecha-sm">
+									{brand._count.products} PRODUCTS
 								</div>
 
-								{/* Category Name */}
-								<h3 className="font-display text-xl font-bold uppercase tracking-wide group-hover:text-primary transition-colors">
-									{cat.name}
+								{/* Brand Name */}
+								<h3 className="font-display text-xl font-bold uppercase tracking-wide group-hover:text-accent transition-colors">
+									{brand.name}
 								</h3>
 
 								{/* Description */}
-								{cat.description && (
+								{brand.description && (
 									<p className="text-sm text-muted-foreground line-clamp-1 mt-1">
-										{cat.description}
+										{brand.description}
 									</p>
 								)}
 
 								{/* Explore Indicator */}
-								<div className="flex items-center gap-2 mt-3 text-primary/60 group-hover:text-primary transition-colors">
+								<div className="flex items-center gap-2 mt-3 text-accent/60 group-hover:text-accent transition-colors">
 									<div className="h-px w-6 bg-current transition-all duration-300 group-hover:w-10" />
 									<span className="font-mono text-[10px] tracking-widest">
-										EXPLORE
+										VIEW ALL
 									</span>
 									<ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
 								</div>
@@ -91,7 +93,7 @@ export async function CategoryNav() {
 
 							{/* Corner Accents */}
 							<svg
-								className="absolute top-2 left-2 w-4 h-4 text-primary/40 group-hover:text-primary transition-colors"
+								className="absolute top-2 left-2 w-4 h-4 text-accent/40 group-hover:text-accent transition-colors"
 								viewBox="0 0 16 16"
 								fill="none"
 								stroke="currentColor"
@@ -99,7 +101,7 @@ export async function CategoryNav() {
 								<path d="M0 8 L0 0 L8 0" />
 							</svg>
 							<svg
-								className="absolute bottom-2 right-2 w-4 h-4 text-primary/40 group-hover:text-primary transition-colors"
+								className="absolute bottom-2 right-2 w-4 h-4 text-accent/40 group-hover:text-accent transition-colors"
 								viewBox="0 0 16 16"
 								fill="none"
 								stroke="currentColor"

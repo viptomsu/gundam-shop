@@ -34,6 +34,11 @@ export async function GET(req: Request) {
 				skip,
 				take: limit,
 				orderBy: { createdAt: "desc" },
+				include: {
+					_count: {
+						select: { products: true },
+					},
+				},
 			}),
 			prisma.brand.count({ where }),
 		]);

@@ -1,45 +1,45 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { fetchApi } from "@/lib/api";
-import { Category } from "@prisma/client";
+import { Series } from "@prisma/client";
 import { SectionHeader } from "./section-header";
 
-type CategoryWithCount = Category & {
+type SeriesWithCount = Series & {
 	_count: {
 		products: number;
 	};
 };
 
 type ApiResponse = {
-	data: CategoryWithCount[];
+	data: SeriesWithCount[];
 	meta: {
 		total: number;
 	};
 };
 
-export async function CategoryNav() {
-	let categories: CategoryWithCount[] = [];
+export async function SeriesNav() {
+	let seriesList: SeriesWithCount[] = [];
 
 	try {
-		const response = await fetchApi<ApiResponse>("/api/categories?limit=8", {
+		const response = await fetchApi<ApiResponse>("/api/series?limit=8", {
 			next: { revalidate: 60 },
 		});
-		categories = response.data;
+		seriesList = response.data;
 	} catch (error) {
-		console.error("Failed to fetch categories:", error);
+		console.error("Failed to fetch series:", error);
 	}
 
-	if (categories.length === 0) {
+	if (seriesList.length === 0) {
 		return null;
 	}
 
 	return (
 		<section className="container px-4 md:px-6 py-12">
-			<SectionHeader title="Browse Categories" viewAllHref="/categories" />
+			<SectionHeader title="Browse Series" viewAllHref="/series" />
 
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-				{categories.map((cat) => (
-					<Link key={cat.id} href={`/categories/${cat.slug}`}>
+				{seriesList.map((series) => (
+					<Link key={series.id} href={`/series/${series.slug}`}>
 						<div className="group relative h-48 overflow-hidden clip-mecha transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
 							{/* Border wrapper */}
 							<div className="absolute inset-0 bg-linear-to-br from-primary/30 via-primary/10 to-primary/30 p-px clip-mecha">
@@ -47,10 +47,10 @@ export async function CategoryNav() {
 							</div>
 
 							{/* Background Image */}
-							{cat.image && (
+							{series.image && (
 								<div
 									className="absolute inset-0 bg-cover bg-center opacity-30 transition-all duration-500 group-hover:opacity-50 group-hover:scale-110"
-									style={{ backgroundImage: `url(${cat.image})` }}
+									style={{ backgroundImage: `url(${series.image})` }}
 								/>
 							)}
 
@@ -64,18 +64,18 @@ export async function CategoryNav() {
 							<div className="relative z-20 h-full p-5 flex flex-col justify-end">
 								{/* Product Count Badge */}
 								<div className="absolute top-4 right-4 font-mono text-[10px] text-primary/70 bg-primary/10 px-2 py-1 clip-mecha-sm">
-									{cat._count.products} ITEMS
+									{series._count.products} UNITS
 								</div>
 
-								{/* Category Name */}
+								{/* Series Name */}
 								<h3 className="font-display text-xl font-bold uppercase tracking-wide group-hover:text-primary transition-colors">
-									{cat.name}
+									{series.name}
 								</h3>
 
 								{/* Description */}
-								{cat.description && (
+								{series.description && (
 									<p className="text-sm text-muted-foreground line-clamp-1 mt-1">
-										{cat.description}
+										{series.description}
 									</p>
 								)}
 

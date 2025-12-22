@@ -44,12 +44,35 @@ export async function GET(request: Request) {
 		if (isFeatured !== null) where.isFeatured = isFeatured === "true";
 		if (isArchived !== null) where.isArchived = isArchived === "true";
 
+		// Handle sort parameter
+		const sort = searchParams.get("sort") || "newest";
+		let orderBy: any = { createdAt: "desc" };
+
+		switch (sort) {
+			case "oldest":
+				orderBy = { createdAt: "asc" };
+				break;
+			case "name-asc":
+				orderBy = { name: "asc" };
+				break;
+			case "name-desc":
+				orderBy = { name: "desc" };
+				break;
+			case "price-asc":
+			case "price-desc":
+				// Price sorting handled after enrichment
+				orderBy = { createdAt: "desc" };
+				break;
+			default:
+				orderBy = { createdAt: "desc" };
+		}
+
 		const [products, total] = await Promise.all([
 			prisma.product.findMany({
 				where,
 				skip,
 				take: limit,
-				orderBy: { createdAt: "desc" },
+				orderBy,
 				include: { categories: true, brand: true, variants: true },
 			}),
 			prisma.product.count({ where }),
@@ -70,6 +93,13 @@ export async function GET(request: Request) {
 				variantCount: variants.length,
 			};
 		});
+
+		// Handle price sorting after enrichment
+		if (sort === "price-asc") {
+			enrichedProducts.sort((a, b) => a.minPrice - b.minPrice);
+		} else if (sort === "price-desc") {
+			enrichedProducts.sort((a, b) => b.minPrice - a.minPrice);
+		}
 
 		const totalPages = Math.ceil(total / limit);
 
