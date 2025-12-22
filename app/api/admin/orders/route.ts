@@ -32,7 +32,13 @@ export async function GET(request: Request) {
 		}
 
 		if (search) {
-			where.orderNumber = { contains: search, mode: "insensitive" as const };
+			where.OR = [
+				{ orderNumber: { contains: search, mode: "insensitive" as const } },
+				{ guestName: { contains: search, mode: "insensitive" as const } },
+				{ guestEmail: { contains: search, mode: "insensitive" as const } },
+				{ user: { name: { contains: search, mode: "insensitive" as const } } },
+				{ user: { email: { contains: search, mode: "insensitive" as const } } },
+			];
 		}
 
 		const [orders, total] = await Promise.all([

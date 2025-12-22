@@ -105,14 +105,8 @@ export default function OrderDetailPage() {
 	const { data: order, isLoading } = useQuery<OrderWithRelations>({
 		queryKey: ["admin-order", orderId],
 		queryFn: async () => {
-			const res = await api.get(`/admin/orders`, {
-				params: { search: orderId, limit: 1 },
-			});
-			// Since we're using search, find the exact order
-			const orders = res.data.data as OrderWithRelations[];
-			const found = orders.find((o) => o.id === orderId);
-			if (!found) throw new Error("Order not found");
-			return found;
+			const res = await api.get(`/admin/orders/${orderId}`);
+			return res.data.data;
 		},
 	});
 

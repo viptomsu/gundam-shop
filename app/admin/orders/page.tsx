@@ -1,10 +1,11 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { toast } from "sonner";
+import { updateOrderStatus } from "@/app/actions/order";
 import Link from "next/link";
 import { Pagination } from "@/components/ui/pagination";
 import api from "@/lib/axios";
@@ -22,12 +23,30 @@ import {
 import { SearchInput } from "@/components/ui/search-input";
 import { Badge } from "@/components/ui/badge";
 import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { useConfirm } from "@/hooks/use-confirm";
+import {
+	MoreHorizontal,
+	Eye,
+	Clock,
+	CheckCircle,
+	Truck,
+	PackageCheck,
+	XCircle,
+} from "lucide-react";
 
 // Order type with relations
 type OrderWithRelations = Order & {
@@ -68,6 +87,8 @@ const paymentStatusConfig: Record<
 };
 
 export default function OrdersPage() {
+	const queryClient = useQueryClient();
+	const confirm = useConfirm();
 	const [params, setParams] = useUrlParams<OrderParams>({
 		page: 1,
 		limit: 10,
@@ -84,6 +105,46 @@ export default function OrdersPage() {
 			return res.data;
 		},
 	});
+
+	const updateStatusMutation = useMutation({
+		mutationFn: async ({
+			orderId,
+			newStatus,
+		}: {
+			orderId: string;
+			newStatus: OrderStatus;
+		}) => {
+			return await updateOrderStatus(orderId, newStatus);
+		},
+		onSuccess: (result) => {
+			if (result.success) {
+				toast.success("Order status updated");
+				queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+			} else {
+				toast.error(result.message || "Failed to update status");
+			}
+		},
+		onError: () => {
+			toast.error("Failed to update status");
+		},
+	});
+
+	const handleStatusChange = async (
+		orderId: string,
+		newStatus: OrderStatus
+	) => {
+		if (newStatus === "CANCELLED") {
+			const ok = await confirm(
+				"Cancel Order?",
+				"This action will restock all items from this order back to inventory. This cannot be undone."
+			);
+			if (ok) {
+				updateStatusMutation.mutate({ orderId, newStatus });
+			}
+		} else {
+			updateStatusMutation.mutate({ orderId, newStatus });
+		}
+	};
 
 	const columns: ColumnDef<OrderWithRelations>[] = [
 		{
@@ -167,15 +228,59 @@ export default function OrdersPage() {
 			id: "actions",
 			header: "Actions",
 			meta: {
-				className: "w-20 text-center",
+				className: "w-24",
 			},
 			cell: ({ row }) => {
+				const order = row.original;
+				const isDisabled =
+					order.status === "CANCELLED" || updateStatusMutation.isPending;
+
 				return (
-					<Button variant="ghost" size="icon" asChild>
-						<Link href={`/admin/orders/${row.original.id}`}>
-							<Eye className="h-4 w-4" />
-						</Link>
-					</Button>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="ghost" size="icon">
+								<span className="sr-only">Open menu</span>
+								<MoreHorizontal className="h-4 w-4" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuLabel>Actions</DropdownMenuLabel>
+							<DropdownMenuItem asChild>
+								<Link href={`/admin/orders/${order.id}`}>
+									<Eye className="mr-2 h-4 w-4" /> View Details
+								</Link>
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuLabel>Update Status</DropdownMenuLabel>
+							<DropdownMenuItem
+								disabled={isDisabled || order.status === "PENDING"}
+								onClick={() => handleStatusChange(order.id, "PENDING")}>
+								<Clock className="mr-2 h-4 w-4" /> Pending
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								disabled={isDisabled || order.status === "CONFIRMED"}
+								onClick={() => handleStatusChange(order.id, "CONFIRMED")}>
+								<CheckCircle className="mr-2 h-4 w-4" /> Confirmed
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								disabled={isDisabled || order.status === "SHIPPING"}
+								onClick={() => handleStatusChange(order.id, "SHIPPING")}>
+								<Truck className="mr-2 h-4 w-4" /> Shipping
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								disabled={isDisabled || order.status === "DELIVERED"}
+								onClick={() => handleStatusChange(order.id, "DELIVERED")}>
+								<PackageCheck className="mr-2 h-4 w-4" /> Delivered
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+								variant="destructive"
+								disabled={isDisabled}
+								onClick={() => handleStatusChange(order.id, "CANCELLED")}>
+								<XCircle className="mr-2 h-4 w-4" /> Cancel Order
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				);
 			},
 		},
