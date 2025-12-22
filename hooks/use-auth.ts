@@ -3,19 +3,16 @@ import api from "@/lib/axios";
 import { LoginInput, RegisterInput } from "@/schemas/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { User } from "@prisma/client";
 
-export interface User {
-	id: string;
-	username: string;
-	role: "USER" | "ADMIN";
-}
+export type SafeUser = Omit<User, "password">;
 
 export function useAuth() {
 	const {
 		data: user,
 		isLoading,
 		error,
-	} = useQuery<User | null>({
+	} = useQuery<SafeUser | null>({
 		queryKey: ["user"],
 		queryFn: async () => {
 			try {
