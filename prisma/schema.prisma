@@ -79,6 +79,7 @@ model Brand {
    slug        String  @unique
    description String?
    logo        String?
+   order       Int     @default(0)
 
    products Product[]
 
@@ -92,6 +93,7 @@ model Category {
    slug        String  @unique
    description String?
    image       String?
+   order       Int     @default(0)
 
    products Product[]
 
@@ -105,6 +107,7 @@ model Series {
    slug        String  @unique
    description String?
    image       String?
+   order       Int     @default(0)
 
    products Product[]
 
