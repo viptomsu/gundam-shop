@@ -87,7 +87,6 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
 										<Input
 											disabled={isPending}
 											placeholder="Enter your name"
-											className="clip-mecha"
 											{...field}
 										/>
 									</FormControl>
@@ -105,7 +104,7 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
 								<Input
 									disabled
 									value={initialData.email}
-									className="bg-muted clip-mecha opacity-80"
+									className="bg-muted opacity-80"
 								/>
 							</FormControl>
 						</FormItem>
@@ -123,7 +122,6 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
 										<Input
 											disabled={isPending}
 											placeholder="+84..."
-											className="clip-mecha"
 											{...field}
 											value={field.value || ""}
 										/>
@@ -147,7 +145,7 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
 									<Textarea
 										disabled={isPending}
 										placeholder="Enter your address"
-										className="min-h-[100px] clip-mecha resize-none"
+										className="min-h-[100px] resize-none"
 										{...field}
 										value={field.value || ""}
 									/>

@@ -2,12 +2,16 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { ModalRegistry } from "@/components/providers/modal-registry";
 import { BulkSaleModal } from "@/components/modals/bulk-sale-modal";
 import { ModalIds } from "@/types/modal";
+import { requireAdmin } from "@/lib/proxy";
 
-export default function AdminLayout({
+export default async function AdminLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
+	// Guard: Only allow ADMIN users
+	await requireAdmin();
+
 	return (
 		<div className="h-full relative">
 			<ModalRegistry modals={{ [ModalIds.BULK_SALE_MODAL]: BulkSaleModal }} />

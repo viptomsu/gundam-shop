@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { paginationSchema } from "@/schemas/common";
 import { OrderStatus } from "@prisma/client";
+import { verifyAdmin } from "@/lib/proxy";
 
 const orderFilterSchema = z.object({
 	status: z.nativeEnum(OrderStatus).optional(),
@@ -10,6 +11,12 @@ const orderFilterSchema = z.object({
 });
 
 export async function GET(request: Request) {
+	// Verify admin access
+	const authResult = await verifyAdmin(request);
+	if (!authResult.success) {
+		return authResult.response;
+	}
+
 	try {
 		const { searchParams } = new URL(request.url);
 

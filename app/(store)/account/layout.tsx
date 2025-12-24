@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Package, User, LogOut, ChevronRight } from "lucide-react";
 import { useAuth, useLogout } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { cn } from "@/lib/utils";
 
 const sidebarLinks = [
@@ -66,11 +67,13 @@ export default function AccountLayout({
 				<aside className="hidden md:block w-64 shrink-0">
 					<div className="sticky top-24">
 						{/* User Header */}
-						<div className="p-4 border border-border/50 bg-card/30 clip-mecha mb-4">
+						<div className="p-4 border border-border/50 bg-card/30 mb-4">
 							<div className="flex items-center gap-3">
-								<div className="w-10 h-10 bg-primary/20 border border-primary/30 flex items-center justify-center clip-mecha-sm">
-									<User className="h-5 w-5 text-primary" />
-								</div>
+								<UserAvatar
+									src={user.avatar}
+									alt={user.name ?? user.email}
+									size="md"
+								/>
 								<div className="flex-1 min-w-0">
 									<p className="font-medium text-sm truncate">
 										{user.name ?? user.email}
@@ -83,7 +86,7 @@ export default function AccountLayout({
 						</div>
 
 						{/* Navigation */}
-						<nav className="border border-border/50 bg-card/30 p-2 space-y-1 clip-mecha">
+						<nav className="border border-border/50 bg-card/30 p-2 space-y-1">
 							<div className="px-3 py-2 text-xs text-muted-foreground font-mono uppercase tracking-wider border-b border-border/30 mb-2">
 								Navigation
 							</div>

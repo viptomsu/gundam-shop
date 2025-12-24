@@ -56,8 +56,7 @@ export function AvatarUploader({
 		<div className="flex flex-col items-center gap-4">
 			<div
 				className={cn(
-					"relative w-32 h-32 overflow-hidden bg-muted border-2 border-primary/20 hover:border-primary/50 transition-colors group",
-					"clip-mecha" // Using the existing mecha clip class
+					"relative w-32 h-32 overflow-hidden bg-muted border-2 border-primary/20 hover:border-primary/50 transition-colors group"
 				)}>
 				{value ? (
 					<Image fill className="object-cover" alt="Avatar" src={value} />

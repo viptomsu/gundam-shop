@@ -21,9 +21,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/ui/logo";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 export function Navbar() {
 	const totalItems = useCartStore(selectTotalItems);
@@ -96,15 +96,11 @@ export function Navbar() {
 									variant="ghost"
 									size="icon"
 									className="p-0 rounded-none">
-									<Avatar className="h-9 w-9">
-										<AvatarImage
-											src="/placeholder-user.jpg"
-											alt={user.name ?? user.email}
-										/>
-										<AvatarFallback>
-											{(user.name ?? user.email).slice(0, 2).toUpperCase()}
-										</AvatarFallback>
-									</Avatar>
+									<UserAvatar
+										src={user.avatar}
+										alt={user.name ?? user.email}
+										size="sm"
+									/>
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="w-56">
@@ -118,10 +114,10 @@ export function Navbar() {
 								</DropdownMenuLabel>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem asChild>
-									<Link href="/profile">Profile</Link>
+									<Link href="/account/profile">Profile</Link>
 								</DropdownMenuItem>
 								<DropdownMenuItem asChild>
-									<Link href="/orders">Orders</Link>
+									<Link href="/account/orders">Orders</Link>
 								</DropdownMenuItem>
 								{user.role === "ADMIN" && (
 									<DropdownMenuItem asChild>

@@ -37,8 +37,8 @@ export function NotFound({
 					</div>
 					<div className="absolute inset-0 flex items-center justify-center">
 						<div className="relative p-1">
-							<div className="absolute inset-0 bg-destructive/20 rounded-lg blur-sm animate-pulse" />
-							<div className="relative bg-destructive/10 border border-destructive/50 rounded-lg p-4">
+							<div className="absolute inset-0 bg-destructive/20 blur-sm animate-pulse" />
+							<div className="relative bg-destructive/10 border border-destructive/50 p-4">
 								<Icon className="h-12 w-12 sm:h-16 sm:w-16 text-destructive" />
 							</div>
 						</div>

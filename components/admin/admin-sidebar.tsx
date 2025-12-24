@@ -1,23 +1,23 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Logo } from "@/components/ui/logo";
+import { UserAvatar } from "@/components/ui/user-avatar";
+import { useAuth, useLogout } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import {
+	Layers,
 	LayoutDashboard,
-	ShoppingBag,
+	LogOut,
 	Package,
-	Users,
+	Settings,
+	ShoppingBag,
+	Store,
 	Tags,
 	Ticket,
-	Settings,
-	LogOut,
-	UserCircle,
-	Layers,
+	Users,
 } from "lucide-react";
-import { useAuth, useLogout } from "@/hooks/use-auth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Logo } from "@/components/ui/logo";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const routes = [
 	{
@@ -64,6 +64,11 @@ const routes = [
 		label: "Settings",
 		icon: Settings,
 		href: "/admin/settings",
+	},
+	{
+		label: "Storefront",
+		icon: Store,
+		href: "/",
 	},
 ];
 
@@ -117,12 +122,12 @@ export function AdminSidebar() {
 			</div>
 			<div className="px-3 py-2 border-t border-gray-800">
 				{user && (
-					<div className="flex items-center gap-x-3 p-3 rounded-lg bg-white/5 border border-white/10">
-						<Avatar className="h-10 w-10">
-							<AvatarFallback className="bg-sky-500 text-white font-bold">
-								{(user.name ?? user.email)?.[0]?.toUpperCase() || "U"}
-							</AvatarFallback>
-						</Avatar>
+					<div className="flex items-center gap-x-3 p-3 bg-white/5 border border-white/10">
+						<UserAvatar
+							src={user.avatar}
+							alt={user.name ?? user.email}
+							size="md"
+						/>
 						<div className="flex flex-col flex-1 min-w-0">
 							<p className="text-sm font-medium text-white truncate">
 								{user.name ?? user.email}
@@ -131,7 +136,7 @@ export function AdminSidebar() {
 						</div>
 						<button
 							onClick={onLogout}
-							className="p-2 hover:bg-white/10 rounded-md transition-colors text-zinc-400 hover:text-red-500"
+							className="p-2 hover:bg-white/10 transition-colors text-zinc-400 hover:text-red-500"
 							title="Logout">
 							<LogOut className="h-5 w-5" />
 						</button>
