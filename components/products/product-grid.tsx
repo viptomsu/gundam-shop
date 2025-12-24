@@ -23,6 +23,7 @@ export function ProductGrid({ products }: ProductGridProps) {
 						price={basePrice}
 						image={image}
 						grade={product.grade || undefined}
+						variants={product.variants}
 					/>
 				);
 			})}

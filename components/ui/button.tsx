@@ -7,7 +7,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-	"inline-flex items-center justify-center gap-2 whitespace-nowrap uppercase text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:drop-shadow-[0_0_8px_rgba(0,225,255,0.5)] relative",
+	"font-mono inline-flex items-center justify-center gap-2 whitespace-nowrap uppercase text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:drop-shadow-[0_0_8px_rgba(0,225,255,0.5)] relative",
 	{
 		variants: {
 			variant: {
@@ -174,33 +174,44 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 					? "group-hover:text-accent-foreground"
 					: "group-hover:text-primary-foreground";
 
+			const innerClasses = cn(
+				"flex items-center justify-center gap-2 bg-background transition-colors duration-300 btn-shine z-0 [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 w-full",
+				groupHoverBgColor,
+				groupHoverTextColor,
+				clipClass, // Clip the inner content to match
+				size === "default" && "h-[calc(theme(spacing.9)-2px)] px-4 py-2", // Re-apply padding internally
+				size === "sm" && "h-[calc(theme(spacing.8)-2px)] px-3",
+				size === "lg" && "h-[calc(theme(spacing.10)-2px)] px-6",
+				size === "icon" && "size-[calc(theme(spacing.8)-2px)]",
+				size === "icon-sm" && "size-[calc(theme(spacing.7)-2px)]",
+				size === "icon-lg" && "size-[calc(theme(spacing.9)-2px)]"
+			);
+
+			const outerClasses = cn(
+				buttonVariants({ variant, color, size, className }),
+				"p-px", // Padding for the border width
+				clipClass, // Clip the outer container (the border)
+				borderColor,
+				hoverBgColor,
+				"transition-colors duration-300"
+			);
+
+			if (asChild) {
+				const child = React.Children.only(children) as React.ReactElement<any>;
+				return (
+					<Slot className={outerClasses} ref={ref} {...props}>
+						{React.cloneElement(child, {
+							children: (
+								<span className={innerClasses}>{child.props.children}</span>
+							),
+						})}
+					</Slot>
+				);
+			}
+
 			return (
-				<Comp
-					className={cn(
-						buttonVariants({ variant, color, size, className }),
-						"p-px", // Padding for the border width
-						clipClass, // Clip the outer container (the border)
-						borderColor,
-						hoverBgColor,
-						"transition-colors duration-300"
-					)}
-					ref={ref}
-					{...props}>
-					<span
-						className={cn(
-							"flex items-center justify-center gap-2 bg-background transition-colors duration-300 btn-shine z-0 [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0",
-							groupHoverBgColor,
-							groupHoverTextColor,
-							clipClass, // Clip the inner content to match
-							size === "default" && "h-[calc(theme(spacing.9)-2px)] px-4 py-2", // Re-apply padding internally
-							size === "sm" && "h-[calc(theme(spacing.8)-2px)] px-3",
-							size === "lg" && "h-[calc(theme(spacing.10)-2px)] px-6",
-							size === "icon" && "size-[calc(theme(spacing.8)-2px)]",
-							size === "icon-sm" && "size-[calc(theme(spacing.7)-2px)]",
-							size === "icon-lg" && "size-[calc(theme(spacing.9)-2px)]"
-						)}>
-						{children}
-					</span>
+				<Comp className={outerClasses} ref={ref} {...props}>
+					<span className={innerClasses}>{children}</span>
 				</Comp>
 			);
 		}

@@ -5,8 +5,14 @@ import { useCallback } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, ChevronDown } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface FilterOption {
 	id: string;
@@ -88,81 +94,83 @@ export function ProductFilters({
 				)}
 			</div>
 
-			{/* Grade Filter */}
-			<FilterSection title="Grade">
-				<div className="space-y-2">
-					{grades.map((grade) => (
-						<FilterCheckbox
-							key={grade.id}
-							id={`grade-${grade.id}`}
-							label={grade.name}
-							checked={currentGrades.includes(grade.id)}
-							onCheckedChange={(checked) =>
-								updateFilters("grade", grade.id, checked)
-							}
-						/>
-					))}
-				</div>
-			</FilterSection>
+			<Accordion
+				type="multiple"
+				defaultValue={["grade", "series", "brand"]}
+				className="w-full">
+				<AccordionItem value="grade" className="border-none">
+					<AccordionTrigger className="hover:no-underline py-2">
+						<span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+							Grade
+						</span>
+					</AccordionTrigger>
+					<AccordionContent>
+						<div className="space-y-2 pt-2">
+							{grades.map((grade) => (
+								<FilterCheckbox
+									key={grade.id}
+									id={`grade-${grade.id}`}
+									label={grade.name}
+									checked={currentGrades.includes(grade.id)}
+									onCheckedChange={(checked) =>
+										updateFilters("grade", grade.id, checked)
+									}
+								/>
+							))}
+						</div>
+					</AccordionContent>
+				</AccordionItem>
 
-			{/* Series Filter */}
-			{series.length > 0 && (
-				<FilterSection title="Series">
-					<div className="space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border">
-						{series.map((s) => (
-							<FilterCheckbox
-								key={s.id}
-								id={`series-${s.id}`}
-								label={s.name}
-								checked={currentSeriesIds.includes(s.id)}
-								onCheckedChange={(checked) =>
-									updateFilters("seriesId", s.id, checked)
-								}
-							/>
-						))}
-					</div>
-				</FilterSection>
-			)}
+				{series.length > 0 && (
+					<AccordionItem value="series" className="border-none">
+						<AccordionTrigger className="hover:no-underline py-2">
+							<span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+								Series
+							</span>
+						</AccordionTrigger>
+						<AccordionContent>
+							<div className="space-y-2 pt-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border">
+								{series.map((s) => (
+									<FilterCheckbox
+										key={s.id}
+										id={`series-${s.id}`}
+										label={s.name}
+										checked={currentSeriesIds.includes(s.id)}
+										onCheckedChange={(checked) =>
+											updateFilters("seriesId", s.id, checked)
+										}
+									/>
+								))}
+							</div>
+						</AccordionContent>
+					</AccordionItem>
+				)}
 
-			{/* Brand Filter */}
-			{brands.length > 0 && (
-				<FilterSection title="Brand">
-					<div className="space-y-2">
-						{brands.map((brand) => (
-							<FilterCheckbox
-								key={brand.id}
-								id={`brand-${brand.id}`}
-								label={brand.name}
-								checked={currentBrandIds.includes(brand.id)}
-								onCheckedChange={(checked) =>
-									updateFilters("brandId", brand.id, checked)
-								}
-							/>
-						))}
-					</div>
-				</FilterSection>
-			)}
-		</div>
-	);
-}
-
-// Filter Section Component
-function FilterSection({
-	title,
-	children,
-}: {
-	title: string;
-	children: React.ReactNode;
-}) {
-	return (
-		<div className="space-y-3">
-			<div className="flex items-center gap-2">
-				<ChevronDown className="h-3 w-3 text-muted-foreground" />
-				<span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
-					{title}
-				</span>
-			</div>
-			{children}
+				{brands.length > 0 && (
+					<AccordionItem value="brand" className="border-none">
+						<AccordionTrigger className="hover:no-underline py-2">
+							<span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+								Brand
+							</span>
+						</AccordionTrigger>
+						<AccordionContent>
+							<div className="space-y-2 pt-2">
+								{brands.map((brand) => (
+									<FilterCheckbox
+										key={brand.id}
+										id={`brand-${brand.id}`}
+										label={brand.name}
+										checked={currentBrandIds.includes(brand.id)}
+										onCheckedChange={(checked) =>
+											updateFilters("brandId", brand.id, checked)
+										}
+									/>
+								))}
+							</div>
+						</AccordionContent>
+					</AccordionItem>
+				)}
+			</Accordion>
 		</div>
 	);
 }

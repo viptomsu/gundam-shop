@@ -9,7 +9,6 @@ import {
 	Crosshair,
 	Zap,
 	Layers,
-	Tag,
 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -22,10 +21,11 @@ import {
 	getDisplayPrice,
 	getOriginalPrice,
 	getDiscountPercent,
-	formatPrice,
 } from "@/lib/product-utils";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cart";
+import { ProductPrice } from "@/components/store/product-price";
+import { VariantSelector } from "@/components/store/variant-selector";
 
 import type { Product, ProductVariant, Brand, Series } from "@prisma/client";
 
@@ -262,50 +262,23 @@ export function ProductView({ product }: ProductViewProps) {
 									<div className="font-mono text-xs text-muted-foreground uppercase tracking-wider mb-2">
 										Unit Cost
 									</div>
-									<div className="flex items-baseline gap-3">
-										<span
-											className={cn(
-												"font-display text-3xl lg:text-4xl font-bold",
-												isOnSale
-													? "text-destructive drop-shadow-[0_0_10px_rgba(255,0,60,0.5)]"
-													: "text-primary drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]"
-											)}>
-											{formatPrice(displayPrice)}
-										</span>
-										{isOnSale && (
-											<span className="text-lg text-muted-foreground line-through">
-												{formatPrice(originalPrice)}
-											</span>
-										)}
-									</div>
+									<ProductPrice
+										price={displayPrice}
+										originalPrice={originalPrice}
+										isOnSale={isOnSale}
+										size="lg"
+									/>
 								</div>
 
 								{/* Variant Selector */}
 								{product.variants.length > 1 && (
 									<div className="mb-6">
-										<div className="font-mono text-xs text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-											<Tag className="h-3 w-3" />
-											Select Variant
-										</div>
-										<div className="flex flex-wrap gap-2">
-											{product.variants.map((variant) => (
-												<button
-													key={variant.id}
-													onClick={() => handleVariantChange(variant)}
-													className={cn(
-														"relative px-4 py-2 font-mono text-sm uppercase tracking-wider border transition-all duration-300",
-														variant.id === selectedVariant.id
-															? "bg-primary/20 border-primary text-primary shadow-[0_0_10px_rgba(6,182,212,0.3)]"
-															: "bg-transparent border-border hover:border-primary/50 text-muted-foreground hover:text-foreground",
-														variant.stock === 0 && "opacity-50"
-													)}>
-													{variant.name}
-													{variant.stock === 0 && (
-														<span className="absolute -top-1 -right-1 w-2 h-2 bg-destructive rounded-full" />
-													)}
-												</button>
-											))}
-										</div>
+										<VariantSelector
+											variants={product.variants}
+											selectedVariant={selectedVariant}
+											onSelect={handleVariantChange}
+											label="Select Variant"
+										/>
 									</div>
 								)}
 

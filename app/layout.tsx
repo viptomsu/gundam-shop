@@ -74,6 +74,8 @@ const shareTechMono = Share_Tech_Mono({
 	variable: "--font-tech-mono",
 });
 
+import { QuickViewModal } from "@/components/store/quick-view-modal";
+
 export default function RootLayout({
 	children,
 }: Readonly<{
@@ -84,7 +86,12 @@ export default function RootLayout({
 			<body
 				className={`${chakraPetch.variable} ${shareTechMono.variable} font-sans antialiased`}>
 				<Providers>
-					<ModalRegistry modals={{ [ModalIds.CONFIRM]: AlertModal }} />
+					<ModalRegistry
+						modals={{
+							[ModalIds.CONFIRM]: AlertModal,
+							[ModalIds.QUICK_VIEW]: QuickViewModal,
+						}}
+					/>
 					{children}
 				</Providers>
 			</body>

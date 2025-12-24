@@ -59,6 +59,11 @@ export async function NewArrivals() {
 								image={image}
 								grade={product.grade || undefined}
 								isNew={true}
+								variants={product.variants.map((v) => ({
+									...v,
+									price: Number(v.price),
+									salePrice: v.salePrice ? Number(v.salePrice) : null,
+								}))}
 							/>
 						);
 					})}
