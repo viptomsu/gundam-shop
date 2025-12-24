@@ -27,7 +27,7 @@ export function Hero() {
 						<div className="space-y-2">
 							<h1 className="text-5xl font-bold tracking-tighter sm:text-6xl md:text-7xl font-display uppercase">
 								<span className="text-transparent bg-clip-text bg-linear-to-r from-white via-white to-white/60">
-									Build Your
+									Lock on your
 								</span>
 								<br />
 								<span className="text-primary relative inline-block">
@@ -44,10 +44,11 @@ export function Hero() {
 
 						{/* Subheadline */}
 						<p className="max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed font-light">
-							Discover the finest collection of Gunpla, from High Grade to
-							Perfect Grade.{" "}
-							<span className="text-primary">Precision engineering</span> meets{" "}
-							<span className="text-primary">artistic expression</span>.
+							Scanning the finest Gunpla collection.{" "}
+							<span className="text-primary">Scope</span>: High Grade to Perfect
+							Grade. Where{" "}
+							<span className="text-primary">Precision engineering</span> locks
+							onto <span className="text-primary">artistic expression</span>.
 						</p>
 
 						{/* Stats Row */}

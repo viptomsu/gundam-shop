@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Facebook, Instagram, Twitter, Github } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 export function Footer() {
 	return (
@@ -8,14 +9,7 @@ export function Footer() {
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 					{/* Brand */}
 					<div className="space-y-4">
-						<Link href="/" className="flex items-center gap-2">
-							<div className="h-8 w-8 bg-primary clip-mecha flex items-center justify-center">
-								<span className="font-bold text-primary-foreground">G</span>
-							</div>
-							<span className="text-xl font-bold tracking-tighter font-display uppercase">
-								Gundam<span className="text-primary">Shop</span>
-							</span>
-						</Link>
+						<Logo size="sm" />
 						<p className="text-sm text-muted-foreground">
 							Premium Gunpla store for hobbyists and collectors. Official Bandai
 							retailer.
@@ -131,7 +125,7 @@ export function Footer() {
 
 				<div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
 					<p className="text-xs text-muted-foreground">
-						&copy; {new Date().getFullYear()} GundamShop. All rights reserved.
+						&copy; {new Date().getFullYear()} G-Reticle. All rights reserved.
 					</p>
 					<div className="flex gap-4 text-xs text-muted-foreground">
 						<Link href="/privacy" className="hover:text-foreground">

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useAuth, useLogout } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Logo } from "@/components/ui/logo";
 
 const routes = [
 	{
@@ -78,13 +79,13 @@ export function AdminSidebar() {
 	return (
 		<div className="gap-4 flex flex-col h-full bg-[#111827] text-white">
 			<div className="px-3 py-2 flex-1">
-				<Link href="/admin" className="flex items-center pl-3 mt-4 mb-14">
-					<div className="relative w-8 h-8 mr-4">
-						{/* Placeholder for logo if needed */}
-						<div className="absolute fill-white font-bold text-2xl">G</div>
-					</div>
-					<h1 className="text-2xl font-bold">Gundam Admin</h1>
-				</Link>
+				<Logo
+					href="/admin"
+					className="pl-3 mt-4 mb-14"
+					suffix={
+						<span className="text-sm font-normal text-slate-400">Admin</span>
+					}
+				/>
 				<div className="space-y-1">
 					{routes.map((route) => (
 						<Link

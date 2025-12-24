@@ -197,9 +197,9 @@ export function ProductView({ product }: ProductViewProps) {
 					</div>
 
 					{/* Right Column - Product Info HUD Panel */}
-					<div className="relative">
+					<div className="relative h-fit">
 						{/* Outer Glow Effect */}
-						<div className="absolute -inset-1 bg-linear-to-b from-primary/20 via-primary/5 to-primary/20 opacity-50 blur-sm clip-mecha" />
+						<div className="absolute inset-0 -m-1 bg-linear-to-b from-primary/20 via-primary/5 to-primary/20 opacity-50 blur-sm clip-mecha" />
 
 						{/* Border Wrapper */}
 						<div
