@@ -12,7 +12,7 @@ import {
 import { useCartStore, selectTotalItems } from "@/store/cart";
 import { useAuth, useLogout } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -24,6 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/ui/logo";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import { SearchBar } from "./search-bar";
 
 export function Navbar() {
 	const totalItems = useCartStore(selectTotalItems);
@@ -38,16 +39,7 @@ export function Navbar() {
 				<Logo textClassName="hidden sm:block" />
 
 				{/* Search Bar - Desktop */}
-				<div className="hidden md:flex items-center flex-1 max-w-md mx-6">
-					<div className="relative w-full">
-						<Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-						<Input
-							type="search"
-							placeholder="Search mobile suits..."
-							className="w-full pl-9 bg-secondary/50 border-border/50 focus-visible:ring-primary/50 tech-input-base"
-						/>
-					</div>
-				</div>
+				<SearchBar />
 
 				{/* Actions */}
 				<div className="flex items-center gap-4">
