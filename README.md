@@ -1,43 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gundam Shop E-commerce
 
-## Getting Started
+Dự án thương mại điện tử chuyên kinh doanh các sản phẩm mô hình Gundam, được xây dựng trên nền tảng công nghệ hiện đại nhằm mang lại trải nghiệm mua sắm mượt mà và tối ưu nhất cho người dùng.
 
-First, run the development server:
+## Tính Năng Chính
+
+Dựa trên thiết kế hệ thống, dự án bao gồm các tính năng nổi bật:
+
+- **Hệ thống Sản phẩm Đa dạng**:
+  - Phân loại theo **Grade** (HG, MG, PG, v.v.) và **Scale** (1/144, 1/100, v.v.).
+  - Hỗ trợ biến thể (Variants) cho từng sản phẩm.
+  - Thông tin chi tiết về Series và Thương hiệu (Brand).
+- **Tìm kiếm & Lọc**: Tìm kiếm sản phẩm nhanh chóng, lọc theo danh mục, thương hiệu, và thông số kỹ thuật.
+- **Giỏ hàng & Đặt hàng**: Quy trình thêm vào giỏ và thanh toán (Checkout) được tối ưu hóa.
+- **Quản lý Đơn hàng**: Theo dõi trạng thái đơn hàng (Chờ xác nhận, Đang giao, Đã giao, v.v.).
+- **Hệ thống Đánh giá**: Người dùng có thể đánh giá và bình luận về sản phẩm.
+- **Admin Dashboard**: Trang quản trị dành cho Admin để quản lý toàn bộ sản phẩm, đơn hàng và người dùng của hệ thống.
+
+## Công Nghệ Sử Dụng
+
+Dự án sử dụng các công nghệ tiên tiến nhất trong hệ sinh thái React/Node.js:
+
+- **Frontend & Framework**: [Next.js 16+](https://nextjs.org/) (App Router) - Tối ưu SEO và hiệu năng.
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) kết hợp với [Shadcn UI](https://ui.shadcn.com/) cho thiết kế đẹp và nhất quán.
+- **Database**: [PostgreSQL](https://www.postgresql.org/) - Cơ sở dữ liệu quan hệ mạnh mẽ.
+- **ORM**: [Prisma](https://www.prisma.io/) - Tương tác với cơ sở dữ liệu dễ dàng và an toàn kiểu dữ liệu (Type-safety).
+- **State Management**: Zustand / React Query (TanStack Query).
+- **Forms**: React Hook Form kết hợp với Zod để validate dữ liệu.
+
+## Hướng Dẫn Cài Đặt
+
+Thực hiện các bước sau để cài đặt dự án trên máy cục bộ (Local):
+
+1.  **Clone dự án**:
+
+    ```bash
+    git clone https://github.com/your-repo/gundam-shop.git
+    cd gundam-shop
+    ```
+
+2.  **Cài đặt các gói thư viện (Dependencies)**:
+
+    ```bash
+    npm install
+    # Hoặc yarn install / pnpm install / bun install
+    ```
+
+3.  **Cấu hình biến môi trường**:
+
+    - Copy file mẫu `.example.env` thành `.env`:
+      ```bash
+      cp .example.env .env
+      ```
+    - Cập nhật các biến quan trọng trong file `.env`:
+      - `DATABASE_URL`: Đường dẫn kết nối PostgreSQL.
+      - `GEMINI_API_KEY`: API Key từ Google Gemini (Phải có nếu dùng tính năng Seed AI).
+      - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: Cấu hình ảnh (để api upload ảnh chạy được).
+
+4.  **Cấu hình Cơ sở dữ liệu**:
+    Đồng bộ schema Prisma vào database:
+
+    ```bash
+    npx prisma generate
+    npx prisma db push
+    ```
+
+5.  **Khởi tạo dữ liệu mẫu (Seeding)**:
+    Có 2 lựa chọn để tạo dữ liệu:
+
+    **Cách 1: Seed Cơ bản (Nhanh)**
+    Sử dụng dữ liệu giả (Faker) và danh sách cứng.
+
+    ```bash
+    npx prisma db seed
+    ```
+
+    **Cách 2: Seed với AI (Chạy rất lâu)**
+    Sử dụng Gemini AI để tạo dữ liệu phong phú và Crawl thêm sản phẩm.
+    _Yêu cầu: Phải có `GEMINI_API_KEY` trong file `.env`._
+
+    ```bash
+    npm run db:init
+    ```
+
+## Hướng Dẫn Chạy
+
+### Chạy môi trường phát triển (Development)
+
+Để khởi chạy ứng dụng ở chế độ dev:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Truy cập [http://localhost:3000](http://localhost:3000) trên trình duyệt để xem kết quả.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Quản lý Database
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Sử dụng Prisma Studio để xem và chỉnh sửa dữ liệu trực quan:
 
-## Learn More
+```bash
+npx prisma studio
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Các lệnh Scripts khác
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Xem trong file `package.json` mục `scripts`:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `npm run build`: Build dự án cho production.
+- `npm run start`: Chạy bản build production.
+- `npm run lint`: Kiểm tra lỗi cú pháp (Linting).
 
-## Deploy on Vercel
+## Demo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Dưới đây là một số hình ảnh thực tế của ứng dụng:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**1. Trang Chủ**
+_(Vui lòng thêm ảnh vào `public/demo/home.png`)_
+![Trang chủ](/demo/home.png)
 
-## Architectural Decisions
+**2. Chi tiết Sản phẩm**
+_(Vui lòng thêm ảnh vào `public/demo/product.png`)_
+![Chi tiết Sản phẩm](/demo/product.png)
 
-- **Schemas**: All Zod schemas are centralized in `schemas/`.
-- **Utils**: Helper functions and formatters are in `utils/`.
-- **Hooks**: Reusable React hooks are in `hooks/`.
-- **API Requests**: Use the configured Axios instance in `lib/axios.ts` for client-side requests.
+## Nguyên Lý & Kiến Trúc
+
+Dự án tuân theo các nguyên tắc thiết kế rõ ràng để đảm bảo tính dễ bảo trì và mở rộng:
+
+- **Schemas (Zod)**: Tất cả các định nghĩa validation schemas được tập trung trong thư mục `schemas/`. Điều này giúp tái sử dụng và đồng bộ logic kiểm tra dữ liệu giữa Client và Server.
+- **Utils**: Các hàm tiện ích chung, format dữ liệu được đặt trong `utils/`.
+- **Hooks**: Các Custom Hooks của React được đặt trong `hooks/` để tách biệt logic khỏi UI components.
+- **API Requests**: Sử dụng `axios` instance đã được cấu hình sẵn trong `lib/axios.ts` cho các request phía Client, đảm bảo thống nhất về xử lý lỗi và headers.
+- **Cấu trúc thư mục**: Tuân thủ chuẩn Next.js App Router, với `app/` chứa các pages và layouts, `components/` chứa các UI components nhỏ.
