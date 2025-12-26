@@ -1,3 +1,10 @@
+import "dotenv/config";
+import { PrismaClient } from "@prisma/client";
+import { generateContent } from "../../utils/ai";
+
+const prisma = new PrismaClient();
+
+const SOURCE_DATA = `
 # I. BRANDS
 
 ### 1. Bandai (Bandai Namco)
@@ -81,3 +88,110 @@
 ### 7. Mobile Suit Gundam: Requiem for Vengeance (2024-2025)
 
 - **Description:** A Netflix original series using Unreal Engine 5 technology. Set on the European Front during the One Year War from Zeon's perspective. The kits feature a realistic, military industrial design, perfect for fans of weathering and gritty aesthetics.
+`;
+
+function cleanJson(text: string): string {
+	return text
+		.replace(/```json/g, "")
+		.replace(/```/g, "")
+		.trim();
+}
+
+// Export for orchestration
+export async function seedMasterData() {
+	console.log("🌱 Starting Master Data Seeding from Description...");
+
+	try {
+		// 1. Clean Database
+		console.log("🧹 Cleaning existing data...");
+		// Delete dependent data first (Product) and then master data
+		await prisma.productVariant.deleteMany();
+		await prisma.review.deleteMany();
+		await prisma.product.deleteMany();
+
+		await prisma.brand.deleteMany();
+		await prisma.category.deleteMany();
+		await prisma.series.deleteMany();
+		console.log("✅ Database cleaned.");
+
+		// 2. Parse Data with AI
+		console.log("🤖 Parsing markdown data with AI...");
+		const prompt = `
+      You are an expert Data Parser.
+      Extract the Brand, Category, and Series data from the following Markdown text into a strict JSON format.
+
+      **Source Text**:
+      ${SOURCE_DATA}
+
+      **Requirements**:
+      - "slug": Generate a URL-friendly slug (kebab-case) from the name.
+      - "name": Clean name (remove parentheses if they complicate the name, e.g., "Bandai (Bandai Namco)" -> "Bandai").
+      - "description": Keep the full description.
+
+      **Output Format**:
+      {
+        "brands": [ { "name": "...", "slug": "...", "description": "..." } ],
+        "categories": [ { "name": "...", "slug": "...", "description": "..." } ],
+        "series": [ { "name": "...", "slug": "...", "description": "..." } ]
+      }
+    `;
+
+		const response = await generateContent({ prompt, model: "flash" });
+		const data = JSON.parse(cleanJson(response || "{}"));
+
+		if (!data.brands || !data.categories || !data.series) {
+			throw new Error("Invalid JSON structure returned by AI");
+		}
+
+		console.log(
+			`✅ Parsed: ${data.brands.length} Brands, ${data.categories.length} Categories, ${data.series.length} Series.`
+		);
+
+		// 3. Insert Data
+		console.log("💾 Inserting data...");
+
+		// Brands
+		for (const item of data.brands) {
+			await prisma.brand.create({
+				data: {
+					name: item.name,
+					slug: item.slug,
+					description: item.description,
+				},
+			});
+		}
+
+		// Categories
+		for (const item of data.categories) {
+			await prisma.category.create({
+				data: {
+					name: item.name,
+					slug: item.slug,
+					description: item.description,
+				},
+			});
+		}
+
+		// Series
+		for (const item of data.series) {
+			await prisma.series.create({
+				data: {
+					name: item.name,
+					slug: item.slug,
+					description: item.description,
+				},
+			});
+		}
+
+		console.log("✨ Seed completed successfully!");
+	} catch (error) {
+		console.error("❌ Error during seeding:", error);
+	} finally {
+		await prisma.$disconnect();
+	}
+}
+
+// Execute if run directly
+if (require.main === module) {
+	seedMasterData();
+}

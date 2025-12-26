@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
-import { generateImage } from "../utils/ai";
-import { uploadToCloudinary } from "../utils/image";
+import { generateImage } from "../../utils/ai";
+import { uploadToCloudinary } from "../../utils/image";
 
 const prisma = new PrismaClient();
 
@@ -215,12 +215,11 @@ async function crawlCategoryImages() {
 // Main
 // ============================================
 
-async function main() {
+// Export for orchestration
+export async function crawlMasterImages(target: string = "all") {
 	console.log("🚀 Starting Master Data Image Crawl...\n");
 
 	try {
-		const target = process.argv[2]; // brands, series, categories, or all
-
 		if (!target || target === "all") {
 			await crawlBrandImages();
 			await crawlSeriesImages();
@@ -235,7 +234,6 @@ async function main() {
 			console.log(
 				"Usage: npx ts-node scripts/crawl-master-images.ts [brands|series|categories|all]"
 			);
-			process.exit(1);
 		}
 
 		console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
@@ -248,4 +246,8 @@ async function main() {
 	}
 }
 
-main();
+// Execute if run directly
+if (require.main === module) {
+	const target = process.argv[2]; // brands, series, categories, or all
+	crawlMasterImages(target);
+}

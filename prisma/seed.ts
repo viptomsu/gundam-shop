@@ -1,6 +1,20 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import {
+	PrismaClient,
+	Prisma,
+	Role,
+	OrderStatus,
+	PaymentStatus,
+	PaymentMethod,
+} from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
+import { faker } from "@faker-js/faker";
+
+import { BRANDS } from "./seed-data/brands";
+import { CATEGORIES } from "./seed-data/categories";
+import { SERIES } from "./seed-data/series";
+import { PRODUCT_TEMPLATES } from "./seed-data/products";
+import { GUNDAM_SCALES } from "../config/constants";
 
 const prisma = new PrismaClient();
 
@@ -18,6 +32,9 @@ async function uploadImage(url: string, publicId: string): Promise<string> {
 		process.env.CLOUDINARY_API_SECRET
 	) {
 		try {
+			// Check if image already exists to avoid re-uploading every time (optional optimization)
+			// For seed, valid to just upload/overwrite or use optimized logic.
+			// Here we keep it simple.
 			const result = await cloudinary.uploader.upload(url, {
 				public_id: publicId,
 				overwrite: true,
@@ -26,7 +43,7 @@ async function uploadImage(url: string, publicId: string): Promise<string> {
 			return result.secure_url;
 		} catch (error) {
 			console.error(`Failed to upload ${publicId}:`, error);
-			return url; // Fallback to original URL if upload fails
+			return url; // Fallback to original URL
 		}
 	} else {
 		console.warn(
@@ -39,12 +56,12 @@ async function uploadImage(url: string, publicId: string): Promise<string> {
 async function main() {
 	console.log("Start seeding...");
 
-	// 1. Cleanup (Order matters!)
+	// 1. Cleanup
 	console.log("Cleaning up database...");
 	await prisma.orderItem.deleteMany();
 	await prisma.order.deleteMany();
-	await prisma.productVariant.deleteMany();
 	await prisma.review.deleteMany();
+	await prisma.productVariant.deleteMany();
 	await prisma.product.deleteMany();
 	await prisma.series.deleteMany();
 	await prisma.category.deleteMany();
@@ -61,169 +78,198 @@ async function main() {
 			email: "admin@gundam.com",
 			password: hashedPassword,
 			name: "Admin User",
-			role: "ADMIN",
+			role: Role.ADMIN,
+			avatar: faker.image.avatar(),
 		},
 	});
 
-	const user = await prisma.user.create({
+	const demoUser = await prisma.user.create({
 		data: {
 			email: "user@gundam.com",
 			password: hashedPassword,
-			name: "Normal User",
-			role: "USER",
+			name: "Demo User",
+			role: Role.USER,
+			avatar: faker.image.avatar(),
+			phone: faker.phone.number(),
+			address: faker.location.streetAddress({ useFullAddress: true }),
 		},
 	});
+
+	const otherUsers = [];
+	for (let i = 0; i < 8; i++) {
+		otherUsers.push(
+			await prisma.user.create({
+				data: {
+					email: faker.internet.email(),
+					password: hashedPassword,
+					name: faker.person.fullName(),
+					role: Role.USER,
+					avatar: faker.image.avatar(),
+					phone: faker.phone.number(),
+					address: faker.location.streetAddress({ useFullAddress: true }),
+				},
+			})
+		);
+	}
+	const allUsers = [demoUser, ...otherUsers];
 
 	// 3. Catalog
 	console.log("Seeding Catalog...");
 
-	// Brands
-	const bandaiLogo = await uploadImage(
-		"https://1000logos.net/wp-content/uploads/2020/09/Bandai-Logo.png",
-		"brand_bandai"
-	);
-	const tamiyaLogo = await uploadImage(
-		"https://static.cdnlogo.com/logos/t/20/tamiya.svg",
-		"brand_tamiya"
-	);
+	// Create Brands
+	const brandMap = new Map();
+	for (const b of BRANDS) {
+		// Real upload optional, using faker/placeholder for speed if no logo provided or failing
+		const item = await prisma.brand.create({
+			data: {
+				name: b.name,
+				slug: b.slug,
+				description: b.description,
+				logo: b.logo, // In real app, consider uploading this to cloudinary
+			},
+		});
+		brandMap.set(b.slug, item.id);
+	}
 
-	const bandai = await prisma.brand.create({
-		data: { name: "Bandai", slug: "bandai", logo: bandaiLogo },
-	});
-	const tamiya = await prisma.brand.create({
-		data: { name: "Tamiya", slug: "tamiya", logo: tamiyaLogo },
-	});
+	// Create Categories
+	const catMap = new Map();
+	for (const c of CATEGORIES) {
+		const item = await prisma.category.create({
+			data: {
+				name: c.name,
+				slug: c.slug,
+				description: c.description,
+			},
+		});
+		catMap.set(c.slug, item.id);
+	}
 
-	// Categories
-	const hg = await prisma.category.create({
-		data: { name: "High Grade (HG)", slug: "hg", description: "1/144 Scale" },
-	});
-	const mg = await prisma.category.create({
-		data: { name: "Master Grade (MG)", slug: "mg", description: "1/100 Scale" },
-	});
-	const pg = await prisma.category.create({
-		data: { name: "Perfect Grade (PG)", slug: "pg", description: "1/60 Scale" },
-	});
-	const tools = await prisma.category.create({
-		data: { name: "Tools & Paints", slug: "tools" },
-	});
-
-	// Series
-	const wfm = await prisma.series.create({
-		data: {
-			name: "Mobile Suit Gundam: The Witch from Mercury",
-			slug: "witch-from-mercury",
-		},
-	});
-	const seed = await prisma.series.create({
-		data: { name: "Mobile Suit Gundam SEED", slug: "gundam-seed" },
-	});
+	// Create Series
+	const seriesMap = new Map();
+	for (const s of SERIES) {
+		const item = await prisma.series.create({
+			data: {
+				name: s.name,
+				slug: s.slug,
+				description: s.description,
+				image: faker.image.urlLoremFlickr({ category: "robot" }),
+			},
+		});
+		seriesMap.set(s.slug, item.id);
+	}
 
 	// 4. Products
 	console.log("Seeding Products...");
+	const products = [];
 
-	// Product 1: HG Aerial
-	const aerialImage = await uploadImage(
-		"https://www.gundamplanet.com/media/catalog/product/h/g/hg-gundam-aerial-box-art.jpg",
-		"product_hg_aerial"
-	);
-	const aerial = await prisma.product.create({
-		data: {
-			name: "HG Gundam Aerial",
-			slug: "hg-gundam-aerial",
-			description:
-				"The protagonist unit from Mobile Suit Gundam: The Witch from Mercury.",
-			grade: "HG",
-			scale: "1/144",
-			images: [aerialImage],
-			brandId: bandai.id,
-			seriesId: wfm.id,
-			categories: { connect: [{ id: hg.id }] },
-			variants: {
-				create: {
-					name: "Standard",
-					price: new Prisma.Decimal(14.99),
-					stock: 50,
-					sku: "HG-AERIAL-001",
-					image: aerialImage,
+	for (const t of PRODUCT_TEMPLATES) {
+		// Find IDs
+		const brandId = brandMap.get(t.brand);
+		const seriesId = t.series ? seriesMap.get(t.series) : null;
+		const catIds = t.cat
+			.map((slug) => catMap.get(slug))
+			.filter((id) => id !== undefined);
+
+		// Upload placeholder image (using a consistent placeholder service or just a string)
+		// For 'realistic' look without real upload, we can use Unsplash source or placeholders
+		const productImg = faker.image.urlLoremFlickr({ category: "robot" });
+
+		const product = await prisma.product.create({
+			data: {
+				name: t.name,
+				slug: faker.helpers
+					.slugify(t.name + "-" + faker.string.alphanumeric(4))
+					.toLowerCase(),
+				description: faker.commerce.productDescription() + ` ${t.name}`,
+				brandId: brandId,
+				seriesId: seriesId,
+				categories: {
+					connect: catIds.map((id) => ({ id })),
+				},
+				images: [productImg, faker.image.urlLoremFlickr({ category: "robot" })],
+				grade: t.grade,
+				scale: t.scale,
+				variants: {
+					create: t.variants.map((v) => ({
+						name: v.name,
+						price: new Prisma.Decimal(v.price),
+						stock: v.stock,
+						sku: faker.string.alphanumeric(8).toUpperCase(),
+						image: productImg,
+					})),
 				},
 			},
-		},
-	});
+			include: { variants: true }, // Include to get variant ID for orders later
+		});
+		products.push(product);
+	}
 
-	// Product 2: MG Freedom 2.0
-	const freedomImage = await uploadImage(
-		"https://www.gundamplanet.com/media/catalog/product/m/g/mg-freedom-gundam-ver-2-0-box-art.jpg",
-		"product_mg_freedom_2"
-	);
-	const freedom = await prisma.product.create({
-		data: {
-			name: "MG Freedom Gundam Ver. 2.0",
-			slug: "mg-freedom-2-0",
-			description:
-				"A Master Grade kit of the Freedom Gundam with updated proportions and articulation.",
-			grade: "MG",
-			scale: "1/100",
-			images: [freedomImage],
-			brandId: bandai.id,
-			seriesId: seed.id,
-			categories: { connect: [{ id: mg.id }] },
-			variants: {
-				create: [
-					{
-						name: "Standard",
-						price: new Prisma.Decimal(45.0),
-						stock: 20,
-						sku: "MG-FREEDOM-001",
-						image: freedomImage,
+	// 5. Orders & Reviews
+	console.log("Seeding Orders & Reviews...");
+
+	for (const u of allUsers) {
+		// Create 0-3 orders per user
+		const orderCount = faker.number.int({ min: 0, max: 3 });
+		for (let i = 0; i < orderCount; i++) {
+			const status = faker.helpers.arrayElement(Object.values(OrderStatus));
+			const items = faker.helpers.arrayElements(
+				products,
+				faker.number.int({ min: 1, max: 3 })
+			);
+
+			let subtotal = 0;
+			const orderItemsData = items.map((prod) => {
+				const variant = prod.variants[0];
+				const qty = faker.number.int({ min: 1, max: 2 });
+				const price = Number(variant.price);
+				subtotal += price * qty;
+				return {
+					variantId: variant.id,
+					quantity: qty,
+					price: new Prisma.Decimal(price),
+					originalPrice: new Prisma.Decimal(price),
+				};
+			});
+
+			await prisma.order.create({
+				data: {
+					userId: u.id,
+					orderNumber: `#ORD-${faker.string.numeric(6)}`,
+					guestName: u.name || "Guest",
+					guestEmail: u.email,
+					guestPhone: u.phone || "0000000000",
+					shippingAddress: u.address || "Unknown Address",
+					subtotal: new Prisma.Decimal(subtotal),
+					totalAmount: new Prisma.Decimal(subtotal + 5), // +5 shipping
+					shippingFee: new Prisma.Decimal(5),
+					status: status,
+					paymentStatus:
+						status === OrderStatus.DELIVERED
+							? PaymentStatus.PAID
+							: PaymentStatus.PENDING,
+					paymentMethod: PaymentMethod.COD,
+					orderItems: {
+						create: orderItemsData,
 					},
-					{
-						name: "Silver Coating",
-						price: new Prisma.Decimal(80.0),
-						stock: 5,
-						sku: "MG-FREEDOM-SILVER",
-						image: freedomImage, // Ideally a different image, but reusing for now
-					},
-				],
-			},
-		},
-	});
-
-	// Product 3: MG Barbatos (Sale)
-	const barbatosImage = await uploadImage(
-		"https://www.gundamplanet.com/media/catalog/product/m/g/mg-gundam-barbatos-box-art.jpg",
-		"product_mg_barbatos"
-	);
-	const yesterday = new Date();
-	yesterday.setDate(yesterday.getDate() - 1);
-	const nextWeek = new Date();
-	nextWeek.setDate(nextWeek.getDate() + 7);
-
-	const barbatos = await prisma.product.create({
-		data: {
-			name: "MG Gundam Barbatos",
-			slug: "mg-gundam-barbatos",
-			description: "The 4th form of Gundam Barbatos from Iron-Blooded Orphans.",
-			grade: "MG",
-			scale: "1/100",
-			images: [barbatosImage],
-			brandId: bandai.id,
-			// No series for IBO seeded yet, leaving null or could add IBO series
-			categories: { connect: [{ id: mg.id }] },
-			variants: {
-				create: {
-					name: "Standard",
-					price: new Prisma.Decimal(50.0),
-					salePrice: new Prisma.Decimal(40.0),
-					saleStartDate: yesterday,
-					saleEndDate: nextWeek,
-					stock: 15,
-					sku: "MG-BARBATOS-001",
-					image: barbatosImage,
 				},
-			},
-		},
-	});
+			});
+		}
+
+		// Create 0-5 reviews per user for random products
+		const reviewCount = faker.number.int({ min: 0, max: 5 });
+		const reviewedProducts = faker.helpers.arrayElements(products, reviewCount);
+
+		for (const prod of reviewedProducts) {
+			await prisma.review.create({
+				data: {
+					userId: u.id,
+					productId: prod.id,
+					rating: faker.number.int({ min: 3, max: 5 }),
+					comment: faker.lorem.sentence(),
+				},
+			});
+		}
+	}
 
 	console.log("Seeding finished.");
 }

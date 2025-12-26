@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
-import { generateContent, generateImage } from "../utils/ai";
-import { uploadToCloudinary } from "../utils/image";
+import { generateContent, generateImage } from "../../utils/ai";
+import { uploadToCloudinary } from "../../utils/image";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -354,7 +354,7 @@ async function seedProduct(product: CrawledProduct): Promise<boolean> {
 // ============================================
 
 function parseProductsMd(): string[] {
-	const filePath = path.join(process.cwd(), "products.md");
+	const filePath = path.join(process.cwd(), "prisma/seed-data/products.md");
 	const content = fs.readFileSync(filePath, "utf-8");
 
 	// Extract product names from markdown (lines starting with **)
@@ -368,7 +368,8 @@ function parseProductsMd(): string[] {
 // MAIN
 // ============================================
 
-async function main() {
+// Export for orchestration
+export async function crawlProducts() {
 	const BATCH_SIZE = 5; // Products per AI call
 	const ADDITIONAL_PRODUCTS = parseInt(process.argv[2]) || 30;
 
@@ -449,4 +450,7 @@ async function main() {
 	}
 }
 
-main();
+// Execute if run directly
+if (require.main === module) {
+	crawlProducts();
+}
