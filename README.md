@@ -112,15 +112,97 @@ Xem trong file `package.json` mục `scripts`:
 
 ## Demo
 
-Dưới đây là một số hình ảnh thực tế của ứng dụng:
+Dưới đây là hình ảnh thực tế về các tính năng và giao diện của ứng dụng:
 
-**1. Trang Chủ**
-_(Vui lòng thêm ảnh vào `public/demo/home.png`)_
-![Trang chủ](/demo/home.png)
+### 1. Trải Nghiệm & Khám Phá
 
-**2. Chi tiết Sản phẩm**
-_(Vui lòng thêm ảnh vào `public/demo/product.png`)_
-![Chi tiết Sản phẩm](/demo/product.png)
+**Trang Chủ & Hero Section**
+Giao diện trang chủ bắt mắt với các banner khuyến mãi và sản phẩm nổi bật.
+![Hero Section](demo/hero-section.png)
+
+**Danh Mục Sản Phẩm**
+Hệ thống hiển thị danh sách sản phẩm trực quan, hỗ trợ phân trang (Pagination).
+![Catalog](demo/catalog-section.png)
+
+**Tìm Kiếm Thông Minh**
+Tính năng tìm kiếm với gợi ý sản phẩm ngay khi gõ.
+![Search Feature](demo/search-feature.png)
+
+**Bộ Lọc Chi Tiết**
+Bộ lọc mạnh mẽ theo danh mục, giá cả và thương hiệu giúp người dùng dễ dàng tìm thấy sản phẩm mong muốn.
+![Filter](demo/filter-by-category-products.png)
+
+**Menu Danh Mục**
+![Categories Page](demo/categories-page.png)
+
+### 2. Chi Tiết Sản Phẩm & Mua Sắm
+
+**Chi Tiết Sản Phẩm**
+Trang thông tin chi tiết với hình ảnh, mô tả, thông số kỹ thuật và các biến thể (Variants).
+![Product Detail](demo/product-detail-page.png)
+
+**Xem Nhanh (Quick View)**
+Xem thông tin sơ lược và thêm vào giỏ hàng mà không cần rời trang hiện tại.
+![Quick View](demo/quick-view-modal.png)
+
+**Giỏ Hàng (Cart)**
+Quản lý các sản phẩm đã chọn, cập nhật số lượng và xem tổng tiền tạm tính.
+![Cart Feature](demo/cart-feature.png)
+
+### 3. Đặt Hàng & Tài Khoản
+
+**Thanh Toán (Checkout)**
+Quy trình thanh toán đơn giản, tích hợp điền thông tin và xác nhận đơn hàng.
+![Checkout Page](demo/checkout-page.png)
+
+**Đăng Nhập & Đăng Ký**
+Hệ thống xác thực bảo mật, hỗ trợ người dùng tạo tài khoản để theo dõi đơn hàng.
+![Login Page](demo/login-page.png)
+![Register Page](demo/register-page.png)
+
+**Quản Lý Tài Khoản**
+Người dùng có thể cập nhật thông tin cá nhân và xem lịch sử hoạt động.
+![Profile Page](demo/profile-page.png)
+
+**Lịch Sử Đơn Hàng**
+Theo dõi trạng thái các đơn hàng đã đặt.
+![My Orders](demo/my-orders-page.png)
+
+**Chi Tiết Đơn Hàng**
+Xem lại thông tin chi tiết của từng đơn hàng.
+![Order Detail](demo/order-detail-dialog.png)
+
+### 4. Admin Dashboard & Quản Trị
+
+**Tổng Quan (Dashboard)**
+Báo cáo thống kê doanh thu, đơn hàng và số lượng người dùng mới.
+![Dashboard](demo/admin/dashboard-page.png)
+
+**Quản Lý Sản Phẩm**
+Danh sách toàn bộ sản phẩm với công cụ lọc và tìm kiếm nâng cao.
+![Product List](demo/admin/product-list-page.png)
+
+**Thêm & Chỉnh Sửa Sản Phẩm**
+Giao diện thêm mới và chỉnh sửa thông tin sản phẩm chi tiết, bao gồm quản lý biến thể (Variants).
+![Product Create](demo/admin/product-create-page.png)
+![Product Edit](demo/admin/product-edit-page.png)
+![Product Variant](demo/admin/product-edit-variant-page.png)
+
+**Quản Lý Đơn Hàng**
+Theo dõi và cập nhật trạng thái đơn hàng của toàn hệ thống.
+![Order List](demo/admin/order-list-page.png)
+![Order Admin Detail](demo/admin/order-detail-page.png)
+
+**Quản Lý Danh Mục & Thương Hiệu**
+Thiết lập danh mục, series và thương hiệu cho sản phẩm.
+![Category List](demo/admin/category-list-page.png)
+![Series List](demo/admin/serie-list-page.png)
+![Brand List](demo/admin/brand-list-page.png)
+
+**Quản Lý Người Dùng**
+Kiểm soát danh sách người dùng và xem thông tin chi tiết.
+![User List](demo/admin/user-list-page.png)
+![User Detail](demo/admin/uder-detail-page.png)
 
 ## Nguyên Lý & Kiến Trúc
 
