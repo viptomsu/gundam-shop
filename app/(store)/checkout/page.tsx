@@ -37,8 +37,9 @@ import {
 	type CheckoutFormValues,
 } from "@/schemas/checkout";
 import { placeOrder } from "@/app/actions/order";
+import { useAuth } from "@/hooks/use-auth";
 
-const SHIPPING_FEE = 30000;
+const SHIPPING_FEE = 5;
 
 export default function CheckoutPage() {
 	const router = useRouter();
@@ -59,10 +60,26 @@ export default function CheckoutPage() {
 		},
 	});
 
+	const { user } = useAuth();
+
 	// Handle hydration mismatch
 	useEffect(() => {
 		setIsMounted(true);
 	}, []);
+
+	// Prefill form when user data is available
+	useEffect(() => {
+		if (user) {
+			form.reset({
+				guestName: user.name || "",
+				guestEmail: user.email || "",
+				guestPhone: user.phone || "",
+				shippingAddress: user.address || "",
+				note: "",
+				paymentMethod: "COD",
+			});
+		}
+	}, [user, form]);
 
 	// Redirect if cart is empty
 	useEffect(() => {

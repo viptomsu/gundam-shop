@@ -93,18 +93,18 @@ export const paymentMethodLabels: Record<PaymentMethod, string> = {
 };
 
 /**
- * Format currency for VND
+ * Format currency for USD
  * Handles Prisma Decimal type and number/string inputs
  */
-export function formatVNCurrency(amount: unknown): string {
+export function formatCurrency(amount: unknown): string {
 	const num =
 		typeof amount === "object" && amount !== null
 			? parseFloat(String(amount))
 			: typeof amount === "string"
 			? parseFloat(amount)
 			: Number(amount);
-	return new Intl.NumberFormat("vi-VN", {
+	return new Intl.NumberFormat("en-US", {
 		style: "currency",
-		currency: "VND",
+		currency: "USD",
 	}).format(num);
 }

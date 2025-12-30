@@ -6,7 +6,7 @@ import { Eye, XCircle, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { orderStatusConfig, formatVNCurrency } from "@/lib/order-config";
+import { orderStatusConfig, formatCurrency } from "@/lib/order-config";
 import type { OrderWithItems } from "@/hooks/queries/use-orders";
 
 interface OrderCardProps {
@@ -84,7 +84,7 @@ export function OrderCard({
 							{itemCount} {itemCount === 1 ? "item" : "items"}
 						</p>
 						<p className="text-lg font-bold text-primary mt-1">
-							{formatVNCurrency(order.totalAmount)}
+							{formatCurrency(order.totalAmount)}
 						</p>
 					</div>
 				</div>
@@ -104,9 +104,9 @@ export function OrderCard({
 
 				{order.status === "PENDING" && (
 					<Button
-						variant="outline"
+						variant="default"
 						size="sm"
-						className="text-destructive border-destructive/50 hover:bg-destructive/10"
+						color="destructive"
 						onClick={() => onCancelOrder(order.id)}
 						disabled={isCancelling}>
 						<XCircle className="h-4 w-4 mr-2" />

@@ -27,7 +27,7 @@ import {
 	orderStatusConfig,
 	paymentStatusConfig,
 	paymentMethodLabels,
-	formatVNCurrency,
+	formatCurrency,
 } from "@/lib/order-config";
 import type { OrderWithItems } from "@/hooks/queries/use-orders";
 
@@ -53,19 +53,21 @@ export function OrderDetailDialog({
 				<DialogHeader className="p-6 pb-4 border-b border-border/30 bg-secondary/20">
 					<div className="flex items-start justify-between gap-4">
 						<div>
-							<DialogTitle className="flex items-center gap-2 text-lg">
-								<Package className="h-5 w-5 text-primary" />
-								Order {order.orderNumber}
-							</DialogTitle>
+							<div className="flex items-center gap-2">
+								<DialogTitle className="flex items-center gap-2 text-lg">
+									<Package className="h-5 w-5 text-primary" />
+									Order {order.orderNumber}
+								</DialogTitle>
+								<Badge
+									variant="outline"
+									className={cn("font-mono", status.className)}>
+									{status.label}
+								</Badge>
+							</div>
 							<DialogDescription className="mt-1 font-mono text-xs">
 								Placed on {format(new Date(order.createdAt), "PPP 'at' p")}
 							</DialogDescription>
 						</div>
-						<Badge
-							variant="outline"
-							className={cn("font-mono", status.className)}>
-							{status.label}
-						</Badge>
 					</div>
 				</DialogHeader>
 
@@ -113,11 +115,11 @@ export function OrderDetailDialog({
 													</span>
 													<span className="text-muted-foreground">•</span>
 													<span className="text-sm font-medium text-primary">
-														{formatVNCurrency(item.price)}
+														{formatCurrency(item.price)}
 													</span>
 													{hasDiscount && (
 														<span className="text-xs text-muted-foreground line-through">
-															{formatVNCurrency(item.originalPrice)}
+															{formatCurrency(item.originalPrice)}
 														</span>
 													)}
 												</div>
@@ -182,24 +184,24 @@ export function OrderDetailDialog({
 								<div className="border-t border-border/30 pt-3 space-y-2">
 									<div className="flex justify-between text-sm">
 										<span className="text-muted-foreground">Subtotal</span>
-										<span>{formatVNCurrency(order.subtotal)}</span>
+										<span>{formatCurrency(order.subtotal)}</span>
 									</div>
 									<div className="flex justify-between text-sm">
 										<span className="text-muted-foreground">Shipping</span>
-										<span>{formatVNCurrency(order.shippingFee)}</span>
+										<span>{formatCurrency(order.shippingFee)}</span>
 									</div>
 									{Number(order.discountAmount) > 0 && (
 										<div className="flex justify-between text-sm">
 											<span className="text-muted-foreground">Discount</span>
 											<span className="text-green-500">
-												-{formatVNCurrency(order.discountAmount)}
+												-{formatCurrency(order.discountAmount)}
 											</span>
 										</div>
 									)}
 									<div className="flex justify-between text-lg font-bold border-t border-border/30 pt-2">
 										<span>Total</span>
 										<span className="text-primary">
-											{formatVNCurrency(order.totalAmount)}
+											{formatCurrency(order.totalAmount)}
 										</span>
 									</div>
 								</div>

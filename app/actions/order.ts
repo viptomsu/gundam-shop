@@ -8,11 +8,11 @@ import {
 import type { CartItem } from "@/store/cart";
 import { PaymentMethod, OrderStatus, PaymentStatus } from "@prisma/client";
 import { verify } from "jsonwebtoken";
-import { cookies } from "next/headers";
 import { ACCESS_TOKEN_SECRET } from "@/config/auth";
+import { getServerAuthCookies } from "@/lib/auth-cookies";
 
-// Shipping fee constant (30,000 VND in cents/base unit)
-const SHIPPING_FEE = 30000;
+// Shipping fee constant (5 USD)
+const SHIPPING_FEE = 5;
 
 interface PlaceOrderResult {
 	success: boolean;
@@ -58,6 +58,22 @@ export async function placeOrder(
 
 		// 3. Execute transaction
 		const variantIds = cartItems.map((item) => item.variantId);
+
+		// Get user ID if logged in
+		const { accessToken } = await getServerAuthCookies();
+		let userId: string | null = null;
+
+		console.log("Access token:", accessToken);
+		if (accessToken) {
+			try {
+				const decoded = verify(accessToken, ACCESS_TOKEN_SECRET) as {
+					userId: string;
+				};
+				userId = decoded.userId;
+			} catch {
+				// Invalid token, ignore (treat as guest)
+			}
+		}
 
 		const order = await prisma.$transaction(async (tx) => {
 			// 3a. Fetch variants with current stock (FOR UPDATE lock in transaction)
@@ -114,6 +130,7 @@ export async function placeOrder(
 			const newOrder = await tx.order.create({
 				data: {
 					orderNumber,
+					userId, // Link to user if logged in
 					guestName: validatedData.data.guestName,
 					guestEmail: validatedData.data.guestEmail,
 					guestPhone: validatedData.data.guestPhone,
@@ -338,8 +355,7 @@ export async function updatePaymentStatus(
 export async function cancelMyOrder(orderId: string): Promise<ActionResult> {
 	try {
 		// Get user from access token cookie
-		const cookieStore = await cookies();
-		const accessToken = cookieStore.get("accessToken")?.value;
+		const { accessToken } = await getServerAuthCookies();
 
 		if (!accessToken) {
 			return { success: false, message: "Unauthorized" };

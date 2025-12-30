@@ -4,6 +4,7 @@ import {
 	ACCESS_TOKEN_EXPIRES_IN,
 	REFRESH_TOKEN_EXPIRES_IN,
 } from "@/config/auth";
+import { cookies } from "next/headers";
 
 export function getAuthCookies(req: Request) {
 	const cookieHeader = req.headers.get("cookie");
@@ -13,6 +14,14 @@ export function getAuthCookies(req: Request) {
 	return {
 		accessToken: cookies.accessToken,
 		refreshToken: cookies.refreshToken,
+	};
+}
+
+export async function getServerAuthCookies() {
+	const cookieStore = await cookies();
+	return {
+		accessToken: cookieStore.get("accessToken")?.value,
+		refreshToken: cookieStore.get("refreshToken")?.value,
 	};
 }
 

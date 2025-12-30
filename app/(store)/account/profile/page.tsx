@@ -1,13 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { ProfileForm } from "./profile-form";
-import { cookies } from "next/headers";
+import { getServerAuthCookies } from "@/lib/auth-cookies";
 import { verify } from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET } from "@/config/auth";
 import { redirect } from "next/navigation";
 
 export default async function ProfilePage() {
-	const cookieStore = await cookies();
-	const accessToken = cookieStore.get("accessToken")?.value;
+	const { accessToken } = await getServerAuthCookies();
 
 	if (!accessToken) {
 		redirect("/login");

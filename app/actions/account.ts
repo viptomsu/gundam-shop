@@ -3,8 +3,8 @@
 import { prisma } from "@/lib/prisma";
 import { profileSchema, type ProfileFormValues } from "@/schemas/user";
 import { verify } from "jsonwebtoken";
-import { cookies } from "next/headers";
 import { ACCESS_TOKEN_SECRET } from "@/config/auth";
+import { getServerAuthCookies } from "@/lib/auth-cookies";
 import { revalidatePath } from "next/cache";
 
 interface UpdateProfileResult {
@@ -16,8 +16,7 @@ export async function updateProfile(
 	formData: ProfileFormValues
 ): Promise<UpdateProfileResult> {
 	try {
-		const cookieStore = await cookies();
-		const accessToken = cookieStore.get("accessToken")?.value;
+		const { accessToken } = await getServerAuthCookies();
 
 		if (!accessToken) {
 			return { success: false, message: "Unauthorized" };

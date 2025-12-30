@@ -37,7 +37,7 @@ import {
 	orderStatusConfig,
 	orderStatusTimeline,
 	paymentMethodLabels,
-	formatVNCurrency,
+	formatCurrency,
 } from "@/lib/order-config";
 import {
 	trackOrder,
@@ -344,7 +344,7 @@ export default function TrackingPage() {
 													<span className="font-mono">x{item.quantity}</span>
 													<span className="text-muted-foreground">•</span>
 													<span className="text-primary font-medium">
-														{formatVNCurrency(item.price)}
+														{formatCurrency(item.price)}
 													</span>
 												</div>
 											</div>
@@ -387,24 +387,24 @@ export default function TrackingPage() {
 									</div>
 									<div className="flex justify-between">
 										<span className="text-muted-foreground">Subtotal</span>
-										<span>{formatVNCurrency(trackedOrder.subtotal)}</span>
+										<span>{formatCurrency(trackedOrder.subtotal)}</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-muted-foreground">Shipping</span>
-										<span>{formatVNCurrency(trackedOrder.shippingFee)}</span>
+										<span>{formatCurrency(trackedOrder.shippingFee)}</span>
 									</div>
 									{trackedOrder.discountAmount > 0 && (
 										<div className="flex justify-between text-green-500">
 											<span>Discount</span>
 											<span>
-												-{formatVNCurrency(trackedOrder.discountAmount)}
+												-{formatCurrency(trackedOrder.discountAmount)}
 											</span>
 										</div>
 									)}
 									<div className="flex justify-between font-bold text-lg border-t border-border/30 pt-2">
 										<span>Total</span>
 										<span className="text-primary">
-											{formatVNCurrency(trackedOrder.totalAmount)}
+											{formatCurrency(trackedOrder.totalAmount)}
 										</span>
 									</div>
 								</div>
