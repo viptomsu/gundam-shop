@@ -7,7 +7,7 @@ Dự án thương mại điện tử chuyên kinh doanh các sản phẩm mô h�
 Dựa trên thiết kế hệ thống, dự án bao gồm các tính năng nổi bật:
 
 - **Hệ thống Sản phẩm Đa dạng**:
-  - Phân loại theo **Grade** (HG, MG, PG, v.v.) và **Scale** (1/144, 1/100, v.v.).
+  - Phân loại đa chiều theo **Danh mục** (Category), **Grade** (HG, MG, PG...) và **Scale** (1/144, 1/100...).
   - Hỗ trợ biến thể (Variants) cho từng sản phẩm.
   - Thông tin chi tiết về Series và Thương hiệu (Brand).
 - **Tìm kiếm & Lọc**: Tìm kiếm sản phẩm nhanh chóng, lọc theo danh mục, thương hiệu, và thông số kỹ thuật.
@@ -20,12 +20,15 @@ Dựa trên thiết kế hệ thống, dự án bao gồm các tính năng nổi
 
 Dự án sử dụng các công nghệ tiên tiến nhất trong hệ sinh thái React/Node.js:
 
-- **Frontend & Framework**: [Next.js 16+](https://nextjs.org/) (App Router) - Tối ưu SEO và hiệu năng.
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) kết hợp với [Shadcn UI](https://ui.shadcn.com/) cho thiết kế đẹp và nhất quán.
+- **Frontend & Framework**: [Next.js 16+](https://nextjs.org/) (App Router), React 19 - Tối ưu SEO và hiệu năng.
+- **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com/) kết hợp với [Shadcn UI](https://ui.shadcn.com/) cho thiết kế đẹp và nhất quán.
 - **Database**: [PostgreSQL](https://www.postgresql.org/) - Cơ sở dữ liệu quan hệ mạnh mẽ.
 - **ORM**: [Prisma](https://www.prisma.io/) - Tương tác với cơ sở dữ liệu dễ dàng và an toàn kiểu dữ liệu (Type-safety).
-- **State Management**: Zustand / React Query (TanStack Query).
-- **Forms**: React Hook Form kết hợp với Zod để validate dữ liệu.
+- **State Management**: Zustand (Client) / React Query (Server).
+- **Forms & Validation**: React Hook Form + Zod.
+- **Charts**: [Recharts](https://recharts.org/) - Biểu đồ thống kê cho Dashboard.
+- **Media**: Cloudinary - Lưu trữ và tối ưu hóa hình ảnh.
+- **AI**: Google Gemini - Hỗ trợ sinh dữ liệu mẫu thông minh.
 
 ## Hướng Dẫn Cài Đặt
 
@@ -209,7 +212,12 @@ Kiểm soát danh sách người dùng và xem thông tin chi tiết.
 Dự án tuân theo các nguyên tắc thiết kế rõ ràng để đảm bảo tính dễ bảo trì và mở rộng:
 
 - **Schemas (Zod)**: Tất cả các định nghĩa validation schemas được tập trung trong thư mục `schemas/`. Điều này giúp tái sử dụng và đồng bộ logic kiểm tra dữ liệu giữa Client và Server.
-- **Utils**: Các hàm tiện ích chung, format dữ liệu được đặt trong `utils/`.
-- **Hooks**: Các Custom Hooks của React được đặt trong `hooks/` để tách biệt logic khỏi UI components.
-- **API Requests**: Sử dụng `axios` instance đã được cấu hình sẵn trong `lib/axios.ts` cho các request phía Client, đảm bảo thống nhất về xử lý lỗi và headers.
-- **Cấu trúc thư mục**: Tuân thủ chuẩn Next.js App Router, với `app/` chứa các pages và layouts, `components/` chứa các UI components nhỏ.
+- **Server Actions**: Logic xử lý dữ liệu (mutations), gửi form được xử lý trực tiếp trên server thông qua Server Actions (`app/actions/`), giúp bảo mật API keys và giảm tải JavaScript cho client.
+- **State Management Hybrid**:
+
+  - **Server State**: Sử dụng React Query để quản lý dữ liệu bất đồng bộ và caching.
+  - **Client State**: Sử dụng Zustand (`store/`) cho các trạng thái UI toàn cục như Giỏ hàng (Cart).
+
+- **Utils & Helpers**: Các hàm tiện ích (format tiền tệ, xử lý ngày tháng) được tách biệt trong `utils/` và `lib/`.
+- **API Requests**: Sử dụng `axios` instance (`lib/axios.ts`) hoặc `fetch` wrapper để đảm bảo thống nhất về xử lý lỗi.
+- **Cấu trúc thư mục**: Tuân thủ chuẩn Feature-based của Next.js App Router, giúp dễ dàng mở rộng và bảo trì.
