@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductView } from "@/components/store/product-view";
+import { fetchApi } from "@/lib/api";
 
 import type { Product, ProductVariant, Brand, Series } from "@prisma/client";
 
@@ -15,17 +16,13 @@ interface ProductPageProps {
 }
 
 async function getProduct(slug: string): Promise<ProductWithRelations | null> {
-	const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-	const res = await fetch(`${baseUrl}/api/products/slug/${slug}`, {
-		next: { revalidate: 60 }, // Cache for 60 seconds
-	});
-
-	if (!res.ok) {
-		if (res.status === 404) return null;
-		throw new Error("Failed to fetch product");
+	try {
+		return await fetchApi<ProductWithRelations>(`/api/products/slug/${slug}`, {
+			next: { revalidate: 60 }, // Cache for 60 seconds
+		});
+	} catch {
+		return null;
 	}
-
-	return res.json();
 }
 
 export async function generateMetadata({
