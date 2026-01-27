@@ -171,7 +171,7 @@ export function CatalogLayout({
 												FILTER_SYSTEM
 											</SheetTitle>
 										</SheetHeader>
-										<div className="mt-6">
+										<div className="mt-6 px-4">
 											<Suspense fallback={<FiltersSkeleton />}>
 												<ProductFilters
 													grades={gradeOptions}

@@ -25,12 +25,20 @@ interface Product {
 	series?: { name: string };
 }
 
-export function SearchBar() {
+export function SearchBar({
+	className,
+	onSearchSelect,
+}: {
+	className?: string;
+	onSearchSelect?: () => void;
+}) {
 	const router = useRouter();
 	const [open, setOpen] = React.useState(false);
 	const [query, setQuery] = React.useState("");
 	const [results, setResults] = React.useState<Product[]>([]);
 	const [loading, setLoading] = React.useState(false);
+
+	// ... (useEffect remains the same)
 
 	React.useEffect(() => {
 		const timer = setTimeout(async () => {
@@ -42,7 +50,7 @@ export function SearchBar() {
 			setLoading(true);
 			try {
 				const res = await fetch(
-					`/api/products?search=${encodeURIComponent(query)}&limit=5`
+					`/api/products?search=${encodeURIComponent(query)}&limit=5`,
 				);
 				const data = await res.json();
 				if (data.data) {
@@ -62,10 +70,15 @@ export function SearchBar() {
 	const handleSelect = (product: Product) => {
 		setOpen(false);
 		router.push(`/products/${product.slug}`);
+		onSearchSelect?.();
 	};
 
 	return (
-		<div className="relative z-50 w-full max-w-md mx-6 hidden md:block">
+		<div
+			className={cn(
+				"relative z-50 w-full max-w-md mx-6 hidden md:block",
+				className,
+			)}>
 			<Command shouldFilter={false} className="bg-transparent overflow-visible">
 				<div className="relative">
 					<Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground z-10" />

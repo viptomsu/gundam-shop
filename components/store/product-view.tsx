@@ -41,7 +41,7 @@ interface ProductViewProps {
 
 export function ProductView({ product }: ProductViewProps) {
 	const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(
-		product.variants[0]
+		product.variants[0],
 	);
 	const [activeImageIndex, setActiveImageIndex] = useState(0);
 	const addItem = useCartStore((state) => state.addItem);
@@ -178,7 +178,7 @@ export function ProductView({ product }: ProductViewProps) {
 											"relative shrink-0 w-20 h-20 border-2 transition-all duration-300 overflow-hidden",
 											index === activeImageIndex
 												? "border-primary shadow-[0_0_10px_rgba(6,182,212,0.5)]"
-												: "border-border/50 hover:border-primary/50"
+												: "border-border/50 hover:border-primary/50",
 										)}>
 										<Image
 											src={img}
@@ -230,9 +230,11 @@ export function ProductView({ product }: ProductViewProps) {
 											{product.brand.name}
 										</Badge>
 										{product.series && (
-											<Badge variant="outline" className="gap-1">
-												<Layers className="h-3 w-3" />
-												{product.series.name}
+											<Badge
+												variant="outline"
+												className="gap-1 max-w-45 sm:max-w-none">
+												<Layers className="h-3 w-3 shrink-0" />
+												<span className="truncate">{product.series.name}</span>
 											</Badge>
 										)}
 										{product.grade && (
